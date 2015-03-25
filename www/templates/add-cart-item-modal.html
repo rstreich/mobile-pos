@@ -1,0 +1,17 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Add Item</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeAddItem()">Cancel</button>
+        </div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <div class="catalog-box">
+            <div ng-repeat="item in items" class="catalog-item" ng-click="addItemToCart(item)">
+                <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
+                <div class="catalog-item-text">{{item.description}}</div>
+                <div class="catalog-item-text">${{item.unitPrice | number:2}} {{item.uom.name}}</div>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

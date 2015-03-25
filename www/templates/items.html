@@ -1,0 +1,32 @@
+<ion-view view-title="Items">
+  <ion-content>
+      <ion-list>
+          <div class="row item item-divider">
+              <div class="col y-centering-box"><h2 class="title">Image</h2></div>
+              <div class="col y-centering-box"><h2 class="title">Description</h2></div>
+              <div class="col y-centering-box"><h2 class="title">Units</h2></div>
+              <div class="col centering-box"><h2 class="title">Is Active</h2></div>
+              <div class="col right-align-box"><h2 class="title">Price</h2></div>
+          </div>
+          <div class="row item" ng-repeat="item in items">
+              <div class="col y-centering-box">
+                  <img class="small-item-img" ng-src="/img/items/{{item.image}}">
+              </div>
+              <div class="col y-centering-box">{{item.description}}</div>
+              <div class="col y-centering-box">{{item.uom.name}}</div>
+              <div class="col centering-box">
+                  <input type="checkbox" ng-model="item.isActive">
+              </div>
+              <div class="col y-centering-box right-align-box">${{item.unitPrice | number:2}}</div>
+          </div>
+      </ion-list>
+
+<!--      <div class="catalog-box">
+          <div ng-repeat="item in items" class="catalog-item">
+              <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
+              <div class="catalog-item-text">{{item.description}}</div>
+              <div class="catalog-item-text">${{item.unitPrice | number:2}} {{item.uom.name}}</div>
+          </div>
+      </div>-->
+  </ion-content>
+</ion-view>

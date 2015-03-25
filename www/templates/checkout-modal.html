@@ -1,0 +1,49 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Complete Sale</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeCheckOut()">Close</button>
+        </div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <div class="list">
+            <div class="row item">
+                <div class="col-80 y-centering-box right-align-box">Amount Due: </div>
+                <div class="col y-centering-box right-align-box">${{cartTotal | number:2}}</div>
+            </div>
+            <div class="row item">
+                <div class="col-80 y-centering-box right-align-box">Amount tendered: </div>
+                <div class="col y-centering-box right-align-box">
+                    <input id="dollars" type="number" ng-init="amountTendered = cartTotal" ng-model="amountTendered">
+                </div>
+            </div>
+            <div class="row item">
+                <div class="col-80 y-centering-box right-align-box">Change due: </div>
+                <div class="col y-centering-box right-align-box">${{(amountTendered - cartTotal) | number:2}}</div>
+            </div>
+            <div class="row item">
+                <div class="col-80 y-centering-box right-align-box">Change Given: </div>
+                <div class="col y-centering-box right-align-box">
+                    <input id="dollars" type="number" ng-model="changeGiven">
+                </div>
+            </div>
+        </div>
+        <!-- TODO: Enable button only when change given is entered. -->
+        <button class="button button-block button-positive" type="button" ng-click="closeCheckOut()">Check Out</button>
+
+        <!--
+        <form ng-submit="doLogin()">
+            <label class="item item-input">
+                <span class="input-label">Username</span>
+                <input type="number" ng-model="loginData.username">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Password</span>
+                <input type="password" ng-model="loginData.password">
+            </label>
+            <label class="item">
+                <button class="button button-block button-positive" type="submit">Log in</button>
+            </label>
+        </form> -->
+    </ion-content>
+</ion-modal-view>

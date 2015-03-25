@@ -1,0 +1,144 @@
+.centering-box {
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.y-centering-box {
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    display: flex;
+    align-items: center;
+}
+
+.x-centering-box {
+    display: -webkit-flex;
+    -webkit-justify-content: center;
+    display: flex;
+    justify-content: center;
+}
+
+.right-align-box {
+    display: -webkit-flex;
+    -webkit-justify-content: flex-end;
+    display: flex;
+    justify-content: flex-end;
+}
+
+input#numeric {
+    border: 2px inset lightgray;
+    text-align: right;
+    width: 3em;
+}
+
+input#dollars {
+    border: 2px inset lightgray;
+    text-align: right;
+    width: 8em;
+}
+
+.bordered {
+    /*background: gray;*/
+    border: thin solid black;
+}
+
+.small-item-img {
+    width: 75px;
+    height: auto;
+}
+
+.catalog-box {
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row wrap;
+    -webkit-flex-flow: row wrap;
+    justify-content: flex-start;
+    -webkit-justify-content: flex-start;
+    align-content: flex-start;
+    -webkit-align-content: flex-start;
+    align-items: flex-start;
+    -webkit-align-items: flex-start;
+}
+
+.catalog-item {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    width: 150px;
+    height: 180px;
+    margin: 10px;
+}
+
+.catalog-item-img {
+    display: -webkit-flex;
+    display: flex;
+    width: 150px;
+    height: auto;
+    flex-flow: row nowrap;
+    -webkit-flex-flow: row nowrap;
+}
+
+.catalog-item-text {
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row;
+    -webkit-flex-flow: row;
+}
+
+.cart-box {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    width: 250px;
+    height: 180px;
+    margin: 10px;
+}
+
+.quantity-selector-box {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    width: 100px;
+}
+
+.quantity-selector-button {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: center;
+    -webkit-justify-content: center;
+    font-size: 2em;
+}
+
+.quantity-selector-qty {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: center;
+    -webkit-justify-content: center;
+    font-size: 1.25em;
+}
+
+.quantity-selector-subtotal {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: center;
+    -webkit-justify-content: center;
+    font-size: 1.5em;
+}

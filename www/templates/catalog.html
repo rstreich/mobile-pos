@@ -1,0 +1,11 @@
+<ion-view view-title="Catalog">
+  <ion-content>
+      <div class="catalog-box">
+          <div ng-repeat="item in items" class="catalog-item">
+              <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
+              <div class="catalog-item-text">{{item.description}}</div>
+              <div class="catalog-item-text">${{item.unitPrice | number:2}} {{item.uom.name}}</div>
+          </div>
+      </div>
+  </ion-content>
+</ion-view>

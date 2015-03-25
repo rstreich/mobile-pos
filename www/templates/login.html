@@ -1,0 +1,21 @@
+<ion-view view-title="Login">
+    <ion-content class="padding">
+        <div class="centering-box" style="height: 60vh">
+            <img src="img/logo.gif" class="centered-item" style="max-width: 50%">
+        </div>
+
+        <form ng-submit="doLogin()">
+            <div class="list list-inset">
+                <label class="item item-input-inset">
+                    <!-- <span class="input-label">Username</span> -->
+                    <input type="text" ng-model="loginData.username" placeholder="Username">
+                </label>
+                <label class="item item-input-inset">
+                    <!-- <span class="input-label">Password</span> -->
+                    <input type="password" ng-model="loginData.password" placeholder="Password">
+                </label>
+                <button class="item button button-block button-positive" type="button">Log in</button>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

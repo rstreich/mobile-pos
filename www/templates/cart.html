@@ -1,0 +1,48 @@
+<ion-view view-title="Current Sale">
+    <ion-nav-buttons side="right">
+        <button class="button button-clear icon ion-plus" ng-click="showAddItem()"></button>
+        <!--<button class="button button-clear icon icon-right ion-ios-arrow-forward"><a ui-sref="cart.summary">Summary</a></button>-->
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <ion-slide-box>
+            <ion-slide>
+                <div class="catalog-box" ng-model="cart">
+                    <div class="cart-box" ng-repeat="cartItem in cart">
+                        <div class="catalog-item">
+                            <img class="catalog-item-img" ng-src="/img/items/{{cartItem.item.image}}">
+
+                            <div class="catalog-item-text">{{cartItem.item.description}}</div>
+                            <div class="catalog-item-text">@${{cartItem.item.unitPrice | number:2}} {{cartItem.item.uom.name}}
+                            </div>
+                        </div>
+                        <div class="quantity-selector-box">
+                            <button ng-model="cartItem.quantity" ng-click="incrementQuantity($index)"
+                                    class="button button-clear ion-plus-circled quantity-selector-button"></button>
+                            <div class="quantity-selector-qty">{{cartItem.quantity}}</div>
+                            <button ng-model="cartItem.quantity" ng-click="decrementQuantity($index)"
+                                    class="button button-clear ion-minus-circled quantity-selector-button"></button>
+                            <div class="quantity-selector-subtotal">${{cartItem.subtotal | number:2}}</div>
+                        </div>
+                    </div>
+                </div>
+            </ion-slide>
+            <ion-slide>
+                <div class="list">
+                    <div class="row item" ng-repeat="cartItem in cart">
+                        <div class="col y-centering-box">{{cartItem.quantity}} {{cartItem.item.uom.name}} {{cartItem.item.description}}</div>
+                        <div class="col-20 y-centering-box right-align-box">${{cartItem.subtotal | number:2}}</div>
+                    </div>
+                </div>
+            </ion-slide>
+        </ion-slide-box>
+    </ion-content>
+    <ion-footer-bar class="bar-footer bar-stable">
+        <div class="col-20 centering-box">
+            <button class="button button-positive" ng-click="emptyCart()">Empty Cart</button>
+        </div>
+        <div class="col-20 centering-box">
+            <button class="button button-positive" ng-click="showCheckOut()">Check Out</button>
+        </div>
+        <div class="col y-centering-box right-align-box" style="font-size: 1.8em">Total: ${{cartTotal | number:2}}</div>
+    </ion-footer-bar>
+</ion-view>
