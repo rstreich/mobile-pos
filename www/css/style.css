@@ -8,10 +8,10 @@
 }
 
 .y-centering-box {
-    display: -webkit-flex;
-    -webkit-align-items: center;
     display: flex;
+    display: -webkit-flex;
     align-items: center;
+    -webkit-align-items: center;
 }
 
 .x-centering-box {
@@ -28,18 +28,6 @@
     justify-content: flex-end;
 }
 
-input#numeric {
-    border: 2px inset lightgray;
-    text-align: right;
-    width: 3em;
-}
-
-input#dollars {
-    border: 2px inset lightgray;
-    text-align: right;
-    width: 8em;
-}
-
 .bordered {
     /*background: gray;*/
     border: thin solid black;
@@ -50,6 +38,29 @@ input#dollars {
     height: auto;
 }
 
+/*
+ * Adustments to ionic css
+ */
+
+.item-content, .item-complex {
+    display: flex;
+    display: -webkit-flex;
+    margin-top: -5px;
+    padding: 0;
+    width: 100%;
+}
+
+.slider {
+    height: 100%;
+}
+
+.scroll {
+    height: 100%
+}
+
+/*
+ * Catalog styles
+ */
 .catalog-box {
     display: -webkit-flex;
     display: flex;
@@ -91,6 +102,9 @@ input#dollars {
     -webkit-flex-flow: row;
 }
 
+/*
+ * Shopping cart styles.
+ */
 .cart-box {
     display: -webkit-flex;
     display: flex;
@@ -113,13 +127,16 @@ input#dollars {
     width: 100px;
 }
 
-.quantity-selector-button {
+.quantity-selector-button-box {
     display: -webkit-flex;
     display: flex;
     flex-direction: row;
     -webkit-flex-direction: row;
     justify-content: center;
     -webkit-justify-content: center;
+}
+
+.quantity-selector-button {
     font-size: 2em;
 }
 
@@ -141,4 +158,82 @@ input#dollars {
     justify-content: center;
     -webkit-justify-content: center;
     font-size: 1.5em;
+}
+
+/*
+ * Edit forms
+ */
+
+.property-row, .property-label, .property-value-text, .property-value-checkbox {
+    display: -webkit-flex;
+    display: flex;
+    height: 4em;
+}
+
+.property-row {
+    flex-flow: row nowrap;
+    -webkit-flex-flow: row nowrap;
+}
+
+.property-label {
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    justify-content: flex-start;
+    -webkit-justify-content: flex-start;
+    align-items: center;
+    -webkit-align-items: center;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 20%;
+    flex: 0 0 20%;
+    max-width: 20%;
+}
+
+.property-value-text, .property-value-checkbox {
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    justify-content: flex-start;
+    -webkit-justify-content: flex-start;
+    align-items: center;
+    -webkit-align-items: center;
+}
+
+.property-value-text {
+}
+
+/*
+ * Input styles--PITA to override ionic
+ * Bootstrappy-like stuff to play with
+ */
+
+input#edit-text, input#dollars {
+    display: block;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    color: #555555;
+    vertical-align: middle;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+input#edit-text:focus, input#dollars:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+input#edit-text {
+    width: 100%;
+}
+
+input#dollars {
+    text-align: right;
+    width: 8em;
 }

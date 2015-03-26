@@ -138,7 +138,7 @@ angular.module('produce.services', [])
             item.id = items.length;
             items.push(item);
         } else {
-            // TODO: Copy data over.
+            // TODO: Nothing now. Item was edited.
         }
     }
 })

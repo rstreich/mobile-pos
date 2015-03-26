@@ -1,21 +1,21 @@
 <ion-view view-title="Users">
     <ion-content class="padding">
-            <ion-list>
-                <div class="row item item-divider">
-                    <div class="col y-centering-box"><h2 class="title">Username</h2></div>
-                    <div class="col centering-box"><h2 class="title">Is Administrator</h2></div>
-                    <div class="col centering-box"><h2 class="title">Is Active</h2></div>
+        <ion-list>
+            <div class="row item item-divider">
+                <div class="col y-centering-box"><h2 class="title">Username</h2></div>
+                <div class="col centering-box"><h2 class="title">Is Administrator</h2></div>
+                <div class="col centering-box"><h2 class="title">Is Active</h2></div>
+            </div>
+            <!-- TODO: Add "change password" doohickey in here -->
+            <div class="row item" ng-repeat="user in users">
+                <div class="col">{{user.name}}</div>
+                <div class="col centering-box">
+                    <input type="checkbox" ng-model="user.isAdmin">
                 </div>
-                <!-- TODO: Add "change password" doohickey in here -->
-                <div class="row item" ng-repeat="user in users">
-                    <div class="col">{{user.name}}</div>
-                    <div class="col centering-box">
-                        <input type="checkbox" ng-model="user.isAdmin">
-                    </div>
-                    <div class="col centering-box">
-                        <input type="checkbox" ng-model="user.isActive">
-                    </div>
+                <div class="col centering-box">
+                    <input type="checkbox" ng-model="user.isActive">
                 </div>
-            </ion-list>
+            </div>
+        </ion-list>
     </ion-content>
 </ion-view>

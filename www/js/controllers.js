@@ -6,8 +6,39 @@ angular.module('produce.controllers', [])
 .controller('LoginController', function($scope, authService) {
 })
 
-.controller('ItemsController', function($scope, itemService) {
+.controller('ItemsController', function($scope, $ionicModal, itemService, uomService) {
+    $scope.uoms = uomService.list();
     $scope.items = itemService.list();
+
+    /*
+     * Edit item modal
+     */
+
+    $ionicModal.fromTemplateUrl('templates/modal.edit-item.html', {
+        scope: $scope
+    }).then(function(modal) {
+        $scope.editItemModal = modal;
+    });
+
+    $scope.closeEditItem = function() {
+        $scope.editItemModal.hide();
+    };
+
+    $scope.showEditItem = function(item) {
+        if (!item) {
+            $scope.editItem = { id: null, description: '', isActive: true, unitPrice: 0.00, image: 'no-image.png', uom: $scope.uoms[0]};
+        } else {
+            $scope.editItem = item;
+        }
+        $scope.editItemModal.show();
+    };
+
+    // TODO: Will a change to a property get propagated?
+    $scope.saveEditItem = function() {
+        itemService.save($scope.editItem);
+        $scope.editItem = null;
+        $scope.closeEditItem();
+    };
 })
 
 .controller('LocationsController', function($scope, locationService) {
@@ -48,8 +79,22 @@ angular.module('produce.controllers', [])
     };
 
     $scope.decrementQuantity = function decrementQuantity(i) {
-        if (-1 < $scope.cart[i].quantity - 1) {
+        if (($scope.cart[i].quantity - 1) >= 0) {
             --$scope.cart[i].quantity;
+            $scope.doSubtotal($scope.cart[i]);
+        }
+        // TODO: Ask to delete item if 0?
+    };
+
+
+    $scope.incrementQuantityTenths = function incrementQuantityTenths(i) {
+        $scope.cart[i].quantity += .1;
+        $scope.doSubtotal($scope.cart[i]);
+    };
+
+    $scope.decrementQuantityTenths = function decrementQuantityTenths(i) {
+        if (($scope.cart[i].quantity - .1) >= 0) {
+            $scope.cart[i].quantity -= .1;
             $scope.doSubtotal($scope.cart[i]);
         }
         // TODO: Ask to delete item if 0?
@@ -63,18 +108,18 @@ angular.module('produce.controllers', [])
      * Add item to cart modal
      */
 
-    $ionicModal.fromTemplateUrl('templates/add-cart-item-modal.html', {
+    $ionicModal.fromTemplateUrl('templates/modal.add-cart-item.html', {
         scope: $scope
     }).then(function(modal) {
-        $scope.addCartItemModal = modal;
+        $scope.editItemModal = modal;
     });
 
     $scope.closeAddItem = function() {
-        $scope.addCartItemModal.hide();
+        $scope.editItemModal.hide();
     };
 
     $scope.showAddItem = function() {
-        $scope.addCartItemModal.show();
+        $scope.editItemModal.show();
     };
 
     $scope.addItemToCart = function(item) {
@@ -90,7 +135,7 @@ angular.module('produce.controllers', [])
     $scope.amountTendered = 0;
     $scope.changeGiven = 0;
 
-    $ionicModal.fromTemplateUrl('templates/checkout-modal.html', {
+    $ionicModal.fromTemplateUrl('templates/modal.checkout.html', {
         scope: $scope
     }).then(function(modal) {
         $scope.checkOutModal = modal;

@@ -16,11 +16,19 @@
                             </div>
                         </div>
                         <div class="quantity-selector-box">
-                            <button ng-model="cartItem.quantity" ng-click="incrementQuantity($index)"
-                                    class="button button-clear ion-plus-circled quantity-selector-button"></button>
-                            <div class="quantity-selector-qty">{{cartItem.quantity}}</div>
-                            <button ng-model="cartItem.quantity" ng-click="decrementQuantity($index)"
-                                    class="button button-clear ion-minus-circled quantity-selector-button"></button>
+                            <div class="quantity-selector-button-box">
+                                <button ng-model="cartItem.quantity" ng-click="incrementQuantity($index)"
+                                        class="button button-clear ion-plus-circled quantity-selector-button"></button>
+                                <button ng-model="cartItem.quantity" ng-click="incrementQuantityTenths($index)"
+                                        class="button button-clear ion-plus-circled quantity-selector-button"></button>
+                            </div>
+                            <div class="quantity-selector-qty">{{cartItem.quantity | number:2}}</div>
+                            <div class="quantity-selector-button-box">
+                                <button ng-model="cartItem.quantity" ng-click="decrementQuantity($index)"
+                                        class="button button-clear ion-minus-circled quantity-selector-button"></button>
+                                <button ng-model="cartItem.quantity" ng-click="decrementQuantityTenths($index)"
+                                        class="button button-clear ion-minus-circled quantity-selector-button"></button>
+                            </div>
                             <div class="quantity-selector-subtotal">${{cartItem.subtotal | number:2}}</div>
                         </div>
                     </div>
