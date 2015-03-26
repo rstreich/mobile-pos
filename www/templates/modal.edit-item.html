@@ -1,0 +1,43 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Add Item</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeEditItem()">Cancel</button>
+        </div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <div class="list">
+            <div class="item property-row">
+                <div class="property-label">Name:</div>
+                <div class="property-value-text">
+                    <input id="edit-text" type="text" ng-required="true" ng-model="editItem.description">
+                </div>
+            </div>
+            <div class="item property-row">
+                <div class="property-label">Unit Price:</div>
+                <div class="property-value-text">
+                    <input id="dollars" type="number" ng-required="true" ng-model="editItem.unitPrice">
+                </div>
+            </div>
+            <div class="item property-row">
+                <div class="property-label">Units:</div>
+                <div class="property-value-text">
+                    <select ng-options="uom.name for uom in uoms track by uom.id" ng-required="true" ng-model="editItem.uom"></select>
+                </div>
+            </div>
+            <div class="item property-row">
+                <div class="property-label">Is Active:</div>
+                <div class="property-value-checkbox">
+                    <input type="checkbox" ng-model="editItem.isActive">
+                </div>
+            </div>
+            <div class="item property-row">
+                <div class="property-label">Image:</div>
+                <div class="property-value-text">
+                    <!-- TODO: File upload -->
+                </div>
+            </div>
+        </div>
+        <button class="button button-block button-positive" ng-click="saveEditItem()" type="button">Save Changes</button>
+    </ion-content>
+</ion-modal-view>
