@@ -26,7 +26,7 @@ angular.module('produce.controllers', [])
 
     $scope.showEditItem = function(item) {
         if (!item) {
-            $scope.editItem = { id: null, description: '', isActive: true, unitPrice: 0.00, image: 'no-image.png', uom: $scope.uoms[0]};
+            $scope.editItem = { id: null, name: '', isActive: true, unitPrice: 0.00, image: 'no-image.png', uom: $scope.uoms[0]};
         } else {
             $scope.editItem = item;
         }

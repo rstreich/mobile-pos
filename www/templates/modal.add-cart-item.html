@@ -7,9 +7,9 @@
     </ion-header-bar>
     <ion-content class="padding">
         <div class="catalog-box">
-            <div ng-repeat="item in items" class="catalog-item" ng-click="addItemToCart(item)">
+            <div ng-repeat="item in items" class="catalog-item card" ng-click="addItemToCart(item)">
                 <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
-                <div class="catalog-item-text">{{item.description}}</div>
+                <div class="catalog-item-text">{{item.name}}</div>
                 <div class="catalog-item-text">${{item.unitPrice | number:2}} {{item.uom.name}}</div>
             </div>
         </div>

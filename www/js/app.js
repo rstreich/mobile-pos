@@ -13,6 +13,13 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
         }
     });
 })
+
+.filter('activeStyle', function() {
+    return function(isActive) {
+        return (isActive ? '' : {'background-color': 'yellow'});
+    }
+})
+
 .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
 

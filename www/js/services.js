@@ -108,17 +108,17 @@ angular.module('produce.services', [])
 
 .service('itemService', function($http, $q) {
     var items = [
-        {id: 1, description: 'Discount', uom: { id: 1, name: 'each' }, unitPrice: 1.00, isActive: true, image: 'discount.png'},
-        {id: 2, description: 'Donation', uom: { id: 1, name: 'each' }, unitPrice: 1.00, isActive: true, image: 'donation.png'},
-        {id: 3, description: 'Asparagus', uom: { id: 2, name: 'lb.' }, unitPrice: 2.34, isActive: true, image: 'asparagus.png'},
-        {id: 4, description: 'Carrots', uom: { id: 2, name: 'lb.' }, unitPrice: 1.10, isActive: true, image: 'carrots.png'},
-        {id: 5, description: 'Cherry Tomatoes', uom: { id: 2, name: 'lb.' }, unitPrice: 1.95, isActive: true, image: 'cherry-tomatoes.png'},
-        {id: 6, description: 'Cucumbers', uom: { id: 2, name: 'lb.' }, unitPrice: 0.48, isActive: true, image: 'cucumbers.png'},
-        {id: 7, description: 'Red Raspberries', uom: { id: 4, name: 'pint' }, unitPrice: 6.45, isActive: true, image: 'raspberries.png'},
-        {id: 8, description: 'Radishes', uom: { id: 2, name: 'lb.' }, unitPrice: 0.60, isActive: true, image: 'red-radishes.png'},
-        {id: 9, description: 'Strawberries', uom: { id: 2, name: 'lb.' }, unitPrice: 4.56, isActive: true, image: 'strawberries.png'},
-        {id: 10, description: 'Sweet Corn', uom: { id: 3, name: 'dozen' }, unitPrice: 2.00, isActive: true, image: 'sweet-corn.png'},
-        {id: 11, description: 'Tomatoes', uom: { id: 2, name: 'lb.' }, unitPrice: 1.69, isActive: true, image: 'tomatoes.png'}
+        {id: 1, name: 'Discount', uom: { id: 1, name: 'each' }, unitPrice: 1.00, isActive: true, image: 'discount.png'},
+        {id: 2, name: 'Donation', uom: { id: 1, name: 'each' }, unitPrice: 1.00, isActive: true, image: 'donation.png'},
+        {id: 3, name: 'Asparagus', uom: { id: 2, name: 'lb.' }, unitPrice: 2.34, isActive: true, image: 'asparagus.png'},
+        {id: 4, name: 'Carrots', uom: { id: 2, name: 'lb.' }, unitPrice: 1.10, isActive: true, image: 'carrots.png'},
+        {id: 5, name: 'Cherry Tomatoes', uom: { id: 2, name: 'lb.' }, unitPrice: 1.95, isActive: true, image: 'cherry-tomatoes.png'},
+        {id: 6, name: 'Cucumbers', uom: { id: 2, name: 'lb.' }, unitPrice: 0.48, isActive: true, image: 'cucumbers.png'},
+        {id: 7, name: 'Red Raspberries', uom: { id: 4, name: 'pint' }, unitPrice: 6.45, isActive: true, image: 'raspberries.png'},
+        {id: 8, name: 'Radishes', uom: { id: 2, name: 'lb.' }, unitPrice: 0.60, isActive: true, image: 'red-radishes.png'},
+        {id: 9, name: 'Strawberries', uom: { id: 2, name: 'lb.' }, unitPrice: 4.56, isActive: true, image: 'strawberries.png'},
+        {id: 10, name: 'Sweet Corn', uom: { id: 3, name: 'dozen' }, unitPrice: 2.00, isActive: true, image: 'sweet-corn.png'},
+        {id: 11, name: 'Tomatoes', uom: { id: 2, name: 'lb.' }, unitPrice: 1.69, isActive: true, image: 'tomatoes.png'}
     ];
 
     this.list = function() {

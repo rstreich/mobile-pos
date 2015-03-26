@@ -10,7 +10,7 @@ var factory = require('../lib/queryFactory');
  * All the properties on Location objects
  * @const
  */
-var allProps = ['id', 'description', 'uom', 'unitPrice', 'isActive', 'image', 'created'];
+var allProps = ['id', 'name', 'uom', 'unitPrice', 'isActive', 'image', 'created'];
 
 /**
  * Convenience string for fields

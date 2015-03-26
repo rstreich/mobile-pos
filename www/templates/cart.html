@@ -7,11 +7,11 @@
         <ion-slide-box>
             <ion-slide>
                 <div class="catalog-box" ng-model="cart">
-                    <div class="cart-box" ng-repeat="cartItem in cart">
+                    <div class="cart-box card" ng-repeat="cartItem in cart">
                         <div class="catalog-item">
                             <img class="catalog-item-img" ng-src="/img/items/{{cartItem.item.image}}">
 
-                            <div class="catalog-item-text">{{cartItem.item.description}}</div>
+                            <div class="catalog-item-text">{{cartItem.item.name}}</div>
                             <div class="catalog-item-text">@${{cartItem.item.unitPrice | number:2}} {{cartItem.item.uom.name}}
                             </div>
                         </div>
@@ -37,7 +37,7 @@
             <ion-slide>
                 <div class="list">
                     <div class="row item" ng-repeat="cartItem in cart">
-                        <div class="col y-centering-box">{{cartItem.quantity}} {{cartItem.item.uom.name}} {{cartItem.item.description}}</div>
+                        <div class="col y-centering-box">{{cartItem.quantity}} {{cartItem.item.uom.name}} {{cartItem.item.name}}</div>
                         <div class="col-20 y-centering-box right-align-box">${{cartItem.subtotal | number:2}}</div>
                     </div>
                 </div>

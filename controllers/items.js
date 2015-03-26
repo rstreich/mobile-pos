@@ -41,8 +41,8 @@ exports.insert = function insertItem(req, res) {
     // Validate input.
     if (!item) {
         return protocol.writeError(400, req, res, 'No item provided.');
-    } else if (!item.description) {
-        return protocol.writeError(400, req, res, 'Missing description.');
+    } else if (!item.name) {
+        return protocol.writeError(400, req, res, 'Missing name.');
     } else if (!item.uom) {
         return protocol.writeError(400, req, res, 'Missing unit of measure.');
     } else if (!item.unitPrice) {
@@ -54,7 +54,7 @@ exports.insert = function insertItem(req, res) {
         if (err) {
             return protocol.writeError(500, req, res, err);
         }
-        return protocol.writeMessage(201, req, res, 'Item ' + item.description + ' added. ID: ' + results.insertId, true);
+        return protocol.writeMessage(201, req, res, 'Item ' + item.name + ' added. ID: ' + results.insertId, true);
     });
 };
 
