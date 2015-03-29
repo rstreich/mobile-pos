@@ -1,9 +1,16 @@
 <ion-view view-title="Units of Measure">
-  <ion-content>
-      <ion-list>
-          <ion-item ng-repeat="uom in uoms" class="item">
-              {{uom.name}}
-          </ion-item>
-      </ion-list>
-  </ion-content>
+    <ion-nav-buttons side="left">
+        <button class="button button-clear icon ion-ios-arrow-back" ng-click="goHere('app.admin')">Administration</button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button class="button button-clear icon ion-plus" ng-click="showEditUom()"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <div class="list">
+            <div class="item item-button-right" ng-repeat="uom in uoms">
+                {{uom.name}}
+                <button class="button button-stable" ng-click="showEditUom(uom)">Edit</button>
+            </div>
+        </div>
+    </ion-content>
 </ion-view>

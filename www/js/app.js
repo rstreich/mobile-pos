@@ -1,6 +1,6 @@
 angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
 
-.run(function ($ionicPlatform) {
+.run(function ($ionicPlatform, $rootScope, $state, $ionicViewSwitcher) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -12,6 +12,11 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
             StatusBar.styleDefault();
         }
     });
+
+    $rootScope.goHere = function(here) {
+        $ionicViewSwitcher.nextDirection('back');
+        $state.go(here);
+    };
 })
 
 .filter('activeStyle', function() {
@@ -23,7 +28,15 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
 .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
 
+    .state('login', {
+        cache: false,
+        url: "/login",
+        templateUrl: "templates/login.html",
+        controller: 'AuthController'
+    })
+
     .state('app', {
+        cache: false,
         url: "/app",
         abstract: true,
         templateUrl: "templates/tabs.html",
@@ -39,40 +52,40 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
         }
     })
 
-    .state('app.items', {
+    .state('app.admin.items', {
         url: "/items",
         views: {
-            'tab-admin': {
+            'tab-admin@app': {
                 templateUrl: "templates/items.html",
                 controller: 'ItemsController'
             }
         }
     })
 
-    .state('app.locations', {
+    .state('app.admin.locations', {
         url: "/locations",
         views: {
-            'tab-admin': {
+            'tab-admin@app': {
                 templateUrl: "templates/locations.html",
                 controller: 'LocationsController'
             }
         }
     })
 
-    .state('app.uoms', {
+    .state('app.admin.uoms', {
         url: "/uoms",
         views: {
-            'tab-admin': {
+            'tab-admin@app': {
                 templateUrl: "templates/uoms.html",
                 controller: 'UomsController'
             }
         }
     })
 
-    .state('app.users', {
+    .state('app.admin.users', {
         url: "/users",
         views: {
-            'tab-admin': {
+            'tab-admin@app': {
                 templateUrl: "templates/users.html",
                 controller: 'UsersController'
             }
@@ -97,17 +110,7 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
                 controller: 'CartController'
             }
         }
-    })
-
-    .state('app.login', {
-        url: "/login",
-        views: {
-            'tab-login': {
-                templateUrl: "templates/login.html",
-                controller: 'LoginController'
-            }
-        }
     });
     // if none of the above states are matched, use this as the fallback
-    $urlRouterProvider.otherwise('/app/login');
+    $urlRouterProvider.otherwise('/login');
 });

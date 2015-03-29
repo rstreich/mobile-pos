@@ -1,20 +1,18 @@
-<ion-view view-title="Login">
+<ion-view cache-view="false" view-title="Login">
     <ion-content class="padding">
         <div class="centering-box" style="height: 60vh">
             <img src="img/logo.gif" class="centered-item" style="max-width: 50%">
         </div>
 
-        <form ng-submit="doLogin()">
+        <form name="loginForm" ng-submit="login()" novalidate>
             <div class="list list-inset">
                 <label class="item item-input-inset">
-                    <!-- <span class="input-label">Username</span> -->
-                    <input type="text" ng-model="loginData.username" placeholder="Username">
+                    <input type="text" ng-model="loginData.username" required placeholder="Username">
                 </label>
                 <label class="item item-input-inset">
-                    <!-- <span class="input-label">Password</span> -->
-                    <input type="password" ng-model="loginData.password" placeholder="Password">
+                    <input type="password" ng-model="loginData.password" required minlength="8" placeholder="Password">
                 </label>
-                <button class="item button button-block button-positive" type="button">Log in</button>
+                <button ng-disabled="!loginForm.$valid" class="item button button-block button-positive" type="submit">Log in</button>
             </div>
         </form>
     </ion-content>

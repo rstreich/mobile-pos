@@ -1,0 +1,21 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Add Location</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeEditLocation()">Cancel</button>
+        </div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <form name="locationForm" class="css-form" novalidate>
+            <div class="list">
+                <div class="item property-row">
+                    <div class="property-label">Name:</div>
+                    <div class="property-value-text">
+                        <input id="edit-text" size="40" maxlength="40" type="text" required ng-model="editLocation.name">
+                    </div>
+                </div>
+            </div>
+            <button ng-disabled="!(locationForm.$valid && locationForm.$dirty)" class="button button-block button-positive" ng-click="saveEditLocation()" type="button">Save Changes</button>
+        </form>
+    </ion-content>
+</ion-modal-view>

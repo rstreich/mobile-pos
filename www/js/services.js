@@ -1,14 +1,50 @@
 angular.module('produce.services', [])
 
-// TODO: Name anonymous functions.
+.service('authService', function($http) {
+    this.user = null;
+    // It's arguable that this belongs here, but the location is required to log in, so....
+    this.currentLocation = null;
 
-.service('authService', function($http, $q) {
-    this.login = function(username, password) {
-
+    this.getUser = function getUser() {
+        if (!this.user) {
+            return null;
+        }
+        return this.user;
     };
 
-    this.logout = function(id) {
+    this.getCurrentLocation = function getCurrentLocation() {
+        if (!this.currentLocation) {
+            return '';
+        }
+        return this.currentLocation.name;
+    };
 
+    this.setCurrentLocation = function setCurrentLocation(location) {
+        return this.currentLocation = location;
+    };
+
+    this.isAdmin = function isAdmin() {
+        if (!this.user) {
+            return false;
+        }
+        return this.user.isAdmin;
+    };
+
+    this.isAuthenticated = function isAuthenticated() {
+        return !!this.user;
+    };
+
+    this.login = function login(username, password) {
+        this.user = { id: 1, name: username, isActive: true, isAdmin: username === 'admin' };
+    };
+
+    this.logout = function logout(id) {
+        // This is a hack because of the issues with state changes.
+        if (this.user) {
+            // TODO: Real logout.
+            this.user = null;
+        }
+        this.currentLocation = null;
     };
 })
 
@@ -22,7 +58,7 @@ angular.module('produce.services', [])
         { id: 6, name: 'sue', isAdmin: false, isActive: true }
     ];
 
-    this.list = function() {
+    this.list = function list() {
         return users;
     };
 
@@ -33,7 +69,7 @@ angular.module('produce.services', [])
         return null;
     };
 
-    this.save = function(user) {
+    this.save = function get(user) {
         // Insert
         if (! user.id) {
             user.id = users.length;
@@ -53,22 +89,22 @@ angular.module('produce.services', [])
         { id: 5, name: 'Their place'}
     ];
 
-    this.list = function() {
+    this.list = function list() {
         return locations;
     };
 
-    this.get = function(id) {
+    this.get = function get(id) {
         if (id <= locations.length) {
             return locations[id - 1];
         }
         return null;
     };
 
-    this.save = function(location) {
+    this.save = function save(location) {
         // Insert
-        if (! location.id) {
+        if (!location.id) {
             location.id = locations.length;
-            locations.push(item);
+            locations.push(location);
         } else {
             // TODO: Copy data over.
         }
@@ -84,18 +120,18 @@ angular.module('produce.services', [])
         { id: 5, name: 'quart'}
     ];
 
-    this.list = function() {
+    this.list = function list() {
         return uoms;
     };
 
-    this.get = function(id) {
+    this.get = function get(id) {
         if (id <= uoms.length) {
             return uoms[id - 1];
         }
         return null;
     };
 
-    this.save = function(uom) {
+    this.save = function save(uom) {
         // Insert
         if (! uom.id) {
             uom.id = uoms.length;
@@ -121,18 +157,18 @@ angular.module('produce.services', [])
         {id: 11, name: 'Tomatoes', uom: { id: 2, name: 'lb.' }, unitPrice: 1.69, isActive: true, image: 'tomatoes.png'}
     ];
 
-    this.list = function() {
+    this.list = function list() {
         return items;
     };
 
-    this.get = function(id) {
+    this.get = function get(id) {
         if (id <= items.length) {
             return items[id - 1];
         }
         return null;
     };
 
-    this.save = function(item) {
+    this.save = function save(item) {
         // Insert
         if (! item.id) {
             item.id = items.length;
@@ -158,20 +194,15 @@ angular.module('produce.services', [])
         { item: items[10], quantity: 1, subtotal: 0.00}
     ];
 
-    this.getCurrentCart = function() {
+    this.getCurrentCart = function getCurrentCart() {
         return cart;
     };
 
-    this.emptyCart = function() {
+    this.emptyCart = function emptyCart() {
         cart.splice(0, cart.length);
     };
 
-    this.get = function(id) {
-
-    };
-
-    this.save = function(user) {
-
+    this.save = function save(user, cart, totalCollected) {
     }
-})
+});
 

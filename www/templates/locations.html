@@ -1,9 +1,16 @@
 <ion-view view-title="Locations">
+    <ion-nav-buttons side="left">
+        <button class="button button-clear icon ion-ios-arrow-back" ng-click="goHere('app.admin')">Administration</button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button class="button button-clear icon ion-plus" ng-click="showEditLocation()"></button>
+    </ion-nav-buttons>
     <ion-content>
-        <ion-list>
-            <ion-item ng-repeat="location in locations" class="item">
+        <div class="list">
+            <div class="item item-button-right" ng-repeat="location in locations">
                 {{location.name}}
-            </ion-item>
-        </ion-list>
+                <button class="button button-stable" ng-click="showEditLocation(location)">Edit</button>
+            </div>
+        </div>
     </ion-content>
 </ion-view>

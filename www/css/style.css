@@ -49,7 +49,7 @@
     padding: 0;
     width: 100%;
 }
-
+/*
 .slider {
     height: 100%;
 }
@@ -57,17 +57,17 @@
 .scroll {
     height: 100%
 }
-
+*/
 /*
  * Catalog styles
  */
-.catalog-box, .catalog-item, .catalog-item-text, .admin-catalog-item, .catalog-item-img, .admin-catalog-img-col,
-.admin-property-col, .admin-catalog-item-body, .admin-catalog-item-hdr, .admin-item-button {
+.catalog-box, .catalog-item, .card-box, .catalog-item-text, .admin-catalog-item, .catalog-item-img, .admin-catalog-img-col,
+.admin-property-col, .admin-catalog-item-body, .admin-catalog-item-hdr, .admin-item-button, .admin-property {
     display: -webkit-flex;
     display: flex;
 }
 
-.catalog-box {
+.catalog-box, .card-box {
     flex-flow: row wrap;
     -webkit-flex-flow: row wrap;
     justify-content: flex-start;
@@ -83,11 +83,10 @@
     -webkit-flex-direction: column;
     justify-content: flex-end;
     -webkit-justify-content: flex-end;
-    width: 150px;
-    height: 180px;
+    width: 160px;
+    height: 190px;
     margin: 10px;
-/*    border: thin solid black;
-    border-radius: 10px; */
+    padding: 5px;
 }
 
 .catalog-item-img {
@@ -97,7 +96,7 @@
     -webkit-flex-flow: row nowrap;
 }
 
-.catalog-item-text {
+.catalog-item-text, .admin-property {
     flex-flow: row;
     -webkit-flex-flow: row;
 }
@@ -166,8 +165,8 @@
     display: flex;
     flex-direction: row;
     -webkit-flex-direction: row;
-    justify-content: flex-end;
-    -webkit-justify-content: flex-end;
+    justify-content: space-around;
+    -webkit-justify-content: space-around;
     width: 260px;
     height: 220px;
     margin: 10px;
@@ -236,8 +235,8 @@
     -webkit-flex-direction: column;
     justify-content: flex-start;
     -webkit-justify-content: flex-start;
-    align-items: center;
-    -webkit-align-items: center;
+    align-items: flex-start;
+    -webkit-align-items: flex-start;
     -webkit-box-flex: 0;
     -webkit-flex: 0 0 20%;
     flex: 0 0 20%;
@@ -253,16 +252,17 @@
     -webkit-align-items: center;
 }
 
-.property-value-text {
+.edit-info {
+    font-size: .8em;
+    color: lightslategray;
 }
 
 /*
  * Input styles--PITA to override ionic
- * Bootstrappy-like stuff to play with
  */
 
 input#edit-text, input#dollars {
-    display: block;
+    /* display: block; */
     height: 34px;
     padding: 6px 12px;
     font-size: 14px;
@@ -292,4 +292,8 @@ input#edit-text {
 input#dollars {
     text-align: right;
     width: 8em;
+}
+
+input#edit-text.ng-invalid.ng-dirty, input#dollars.ng-invalid.ng-dirty {
+    background-color: #FA787E;
 }

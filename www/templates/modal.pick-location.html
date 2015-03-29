@@ -1,0 +1,11 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Please select a location</h1>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <form name="pickLocationForm" class="css-form" novalidate>
+            <select ng-options="location.name for location in locations track by location.id" required ng-model="pickedLocation"></select>
+            <button ng-disabled="pickLocationForm.$invalid" class="button button-block button-positive" ng-click="closePickLocation()" type="button">Select Location</button>
+        </form>
+    </ion-content>
+</ion-modal-view>

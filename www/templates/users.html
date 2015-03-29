@@ -1,21 +1,21 @@
 <ion-view view-title="Users">
+    <ion-nav-buttons side="left">
+        <button class="button button-clear icon ion-ios-arrow-back" ng-click="goHere('app.admin')">Administration</button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button class="button button-clear icon ion-plus" ng-click="showEditUser()"></button>
+    </ion-nav-buttons>
     <ion-content class="padding">
-        <ion-list>
-            <div class="row item item-divider">
-                <div class="col y-centering-box"><h2 class="title">Username</h2></div>
-                <div class="col centering-box"><h2 class="title">Is Administrator</h2></div>
-                <div class="col centering-box"><h2 class="title">Is Active</h2></div>
+        <div class="list">
+            <div class="item item-button-right" ng-repeat="user in users">
+                {{user.name}}
+                <span ng-if="!user.isActive || user.isAdmin">(</span>
+                <span ng-if="!user.isActive">inactive</span>
+                <span ng-if="!user.isActive && user.isAdmin">, </span>
+                <span ng-if="user.isAdmin">admin</span>
+                <span ng-if="!user.isActive || user.isAdmin">)</span>
+                <button class="button button-stable" ng-click="showEditUser(user)">Edit</button>
             </div>
-            <!-- TODO: Add "change password" doohickey in here -->
-            <div class="row item" ng-repeat="user in users">
-                <div class="col">{{user.name}}</div>
-                <div class="col centering-box">
-                    <input type="checkbox" ng-model="user.isAdmin">
-                </div>
-                <div class="col centering-box">
-                    <input type="checkbox" ng-model="user.isActive">
-                </div>
-            </div>
-        </ion-list>
+        </div>
     </ion-content>
 </ion-view>

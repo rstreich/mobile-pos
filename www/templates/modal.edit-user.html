@@ -1,0 +1,42 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Add Item</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeEditUser()">Cancel</button>
+        </div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <form name="userForm" class="css-form" novalidate>
+            <div class="list">
+                <div class="item property-row">
+                    <div class="property-label">Name:</div>
+                    <div class="property-value-text">
+                        <input id="edit-text" size="20" maxlength="20" type="text" required ng-model="editUser.name">
+                    </div>
+                </div>
+                <div class="item property-row">
+                    <div class="property-label">Password: </div>
+                    <div class="property-value-text">
+                        <div class="y-centering-box">
+                            <input id="edit-text" size="20" minlength="8" type="text" ng-required="pwdRequired" ng-model="editUser.pwd">
+                            <span class="edit-info" ng-if="!pwdRequired"> (Current password not shown)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item property-row">
+                    <div class="property-label">Is Active:</div>
+                    <div class="property-value-checkbox">
+                        <input type="checkbox" ng-model="editUser.isActive">
+                    </div>
+                </div>
+                <div class="item property-row">
+                    <div class="property-label">Is Admin:</div>
+                    <div class="property-value-checkbox">
+                        <input type="checkbox" ng-model="editUser.isAdmin">
+                    </div>
+                </div>
+            </div>
+            <button ng-disabled="!(userForm.$valid && userForm.$dirty)" class="button button-block button-positive" ng-click="saveEditUser()" type="button">Save Changes</button>
+        </form>
+    </ion-content>
+</ion-modal-view>

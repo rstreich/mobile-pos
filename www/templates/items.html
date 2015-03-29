@@ -1,4 +1,7 @@
 <ion-view view-title="Items">
+    <ion-nav-buttons side="left">
+        <button class="button button-clear icon ion-ios-arrow-back" ng-click="goHere('app.admin')">Administration</button>
+    </ion-nav-buttons>
     <ion-nav-buttons side="right">
         <button class="button button-clear icon ion-plus" ng-click="showEditItem()"></button>
     </ion-nav-buttons>
@@ -7,7 +10,7 @@
             <div ng-repeat="item in items" class="admin-catalog-item card">
                 <div class="admin-catalog-item-hdr">
                     {{item.name}}
-                    <button class="admin-item-button button-calm" style="align-self: flex-end" ng-click="showEditItem(item)">Edit</button>
+                    <button class="admin-item-button button-stable" ng-click="showEditItem(item)">Edit</button>
                 </div>
                 <div class="admin-catalog-item-body">
                     <div class="admin-catalog-img-col">
@@ -21,27 +24,5 @@
                 </div>
             </div>
         </div>
-        <!--
-        <ion-list>
-            <div class="row item item-divider">
-                <div class="col y-centering-box"><h2 class="title">Image</h2></div>
-                <div class="col y-centering-box"><h2 class="title">Name</h2></div>
-                <div class="col y-centering-box"><h2 class="title">Units</h2></div>
-                <!- - <div class="col centering-box"><h2 class="title">Is Active</h2></div> - ->
-                <div class="col right-align-box"><h2 class="title">Price</h2></div>
-            </div>
-            <div class="row item" ng-repeat="item in items" ng-style="item.isActive | activeStyle">
-                <div class="col y-centering-box">
-                    <img class="small-item-img" ng-src="/img/items/{{item.image}}">
-                </div>
-                <div class="col y-centering-box">{{item.name}}</div>
-                <div class="col y-centering-box">{{item.uom.name}}</div>
-                <!- - <div class="col centering-box">
-                    <i class="icon ion-checkmark" ng-if="item.isActive"></i>
-                </div>- ->
-                <div class="col y-centering-box right-align-box">${{item.unitPrice | number:2}}</div>
-            </div>
-        </ion-list>-->
-
     </ion-content>
 </ion-view>
