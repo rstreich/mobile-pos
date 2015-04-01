@@ -1,49 +1,72 @@
+<!-- style="width: 90%; height: 90%; top: 5%; left: 5%; right: 5%; bottom: 5%;" -->
 <ion-modal-view>
-    <ion-header-bar>
-        <h1 class="title">Complete Sale</h1>
+    <ion-header-bar class="bar bar-header bar-positive">
+        <div class="buttons">
+            <button class="button button-clear icon-left ion-ios-arrow-back" ng-show="steps[currentStep].previous" ng-click="previousStep()">{{steps[currentStep].previous.name}}</button>
+        </div>
+        <h1 class="title">Check Out</h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeCheckOut()">Close</button>
         </div>
     </ion-header-bar>
     <ion-content class="padding">
-        <div class="list">
-            <div class="row item">
-                <div class="col-80 y-centering-box right-align-box">Amount Due: </div>
-                <div class="col y-centering-box right-align-box">${{cartTotal | number:2}}</div>
-            </div>
-            <div class="row item">
-                <div class="col-80 y-centering-box right-align-box">Amount tendered: </div>
-                <div class="col y-centering-box right-align-box">
-                    <input id="dollars" type="number" ng-init="amountTendered = cartTotal" ng-model="amountTendered">
-                </div>
-            </div>
-            <div class="row item">
-                <div class="col-80 y-centering-box right-align-box">Change due: </div>
-                <div class="col y-centering-box right-align-box">${{(amountTendered - cartTotal) | number:2}}</div>
-            </div>
-            <div class="row item">
-                <div class="col-80 y-centering-box right-align-box">Change Given: </div>
-                <div class="col y-centering-box right-align-box">
-                    <input id="dollars" type="number" ng-model="changeGiven">
-                </div>
-            </div>
-        </div>
-        <!-- TODO: Enable button only when change given is entered. -->
-        <button class="button button-block button-positive" type="button" ng-click="closeCheckOut()">Check Out</button>
+        <div ui-view name="checkout"></div>
 
-        <!--
-        <form ng-submit="doLogin()">
-            <label class="item item-input">
-                <span class="input-label">Username</span>
-                <input type="number" ng-model="loginData.username">
-            </label>
-            <label class="item item-input">
-                <span class="input-label">Password</span>
-                <input type="password" ng-model="loginData.password">
-            </label>
-            <label class="item">
-                <button class="button button-block button-positive" type="submit">Log in</button>
-            </label>
-        </form> -->
+        <script id="part.tender-money.html" type="text/ng-template">
+            <div class="checkout-box">
+                <div class="checkout-row">
+                    <div class="checkout-col">
+                        <div class="checkout-total">Due: {{(cartTotal - checkoutData.amountTendered) | number:2}}</div>
+                    </div>
+                    <div class="checkout-col">
+                        <div class="checkout-total">Received&emsp;<input id="dollars" type="number" step="any" ng-model="checkoutData.amountTendered"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="checkout-box">
+                <div class="checkout-row">
+                    <div class="checkout-button-col">
+                        <button class="money-button" ng-click="addTendered(1)">+$1</button>
+                        <button class="money-button" ng-click="addTendered(5)">+$5</button>
+                    </div>
+                    <div class="checkout-button-col">
+                        <button class="money-button" ng-click="addTendered(10)">+$10</button>
+                        <button class="money-button" ng-click="addTendered(20)">+$20</button>
+                    </div>
+                </div>
+                <button class="money-button" ng-click="clearTendered()">Reset</button>
+                <button class="money-button" ng-click="setTendered(cartTotal)">Full Amount</button>
+            </div>
+            <button class="button button-block button-positive" ng-show="steps[currentStep].next" ng-click="nextStep()">{{steps[currentStep].current.name}}</button>
+        </script>
+
+        <script id="part.handle-change.html" type="text/ng-template">
+            <div class="checkout-box">
+                <div class="checkout-row">
+                    <div class="checkout-col">
+                        <div class="checkout-total">Change due: ${{changeDue() | number:2}}</div>
+                    </div>
+                    <div class="checkout-col">
+                        <div class="checkout-total">Change given:&emsp;<input id="dollars" type="number" step="any" ng-model="checkoutData.changeGiven"></div>
+                    </div>
+                </div>
+                <button class="money-button" ng-click="setChangeGiven(changeDue())">All</button>
+            </div>
+            <button class="button button-block button-positive" ng-show="steps[currentStep].next" ng-click="nextStep()">{{steps[currentStep].current.name}}</button>
+        </script>
+
+        <script id="part.complete-sale.html" type="text/ng-template">
+            <div class="list">
+                <div class="item checkout-total">Total in Cart: ${{cartTotal | number:2}}</div>
+                <div class="item checkout-total">Money Received: ${{checkoutData.amountTendered | number:2}}</div>
+                <div class="item checkout-total">Change Given: ${{checkoutData.changeGiven | number:2}}</div>
+                <div class="item checkout-total">Total Sale: ${{$scope.checkoutData.amountTendered - $scope.checkoutData.changeGiven | number:2}}</div>
+            </div>
+            <button class="button button-block button-positive" ng-click="completeSale()">Complete Sale</button>
+            <ion-spinner ng-show="stillSaving"></ion-spinner>
+        </script>
     </ion-content>
+<!--    <ion-footer-bar class="bar-footer bar-stable">
+        <div class="col y-centering-box right-align-box" style="font-size: 1.8em">Total: ${{cartTotal | number:2}}</div>
+    </ion-footer-bar>-->
 </ion-modal-view>

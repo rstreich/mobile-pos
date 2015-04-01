@@ -1,5 +1,5 @@
 angular.module('produce.controllers', [])
-
+// TODO: Ensure all vars that appear in models are prefixed with "data."
 /*
  * Controller for the login page.
  */
@@ -19,15 +19,56 @@ angular.module('produce.controllers', [])
     };
 })
 
+.controller('IndexController', function($scope, $ionicPopover, authService) {
+    var self = this;
+    this.locationPickerModal = authService.getLocationModal();
+    this.changePasswordModal = authService.getChangePasswordModal();
+
+    $ionicPopover.fromTemplateUrl('templates/popover.user-info.html', {
+        scope: $scope
+    }).then(function(popover) {
+        $scope.userInfoPopover = popover;
+    });
+
+    $scope.isAuthenticated = function isAuthenticated() {
+        return authService.isAuthenticated();
+    };
+
+    $scope.getUsername = function getUsername() {
+        var user = authService.getUser();
+        return !user ? '' : user.name;
+    };
+
+    $scope.getLocationName = function getLocationName() {
+        var location = authService.getCurrentLocation();
+        return !location ? '' : location.name;
+    };
+
+    $scope.showLocationPicker = function showLocationPicker() {
+        $scope.userInfoPopover.hide();
+        self.locationPickerModal.init($scope)
+            .then(function(modal) {
+                modal.show();
+            });
+    };
+
+    $scope.showChangePassword = function showChangePassword() {
+        $scope.userInfoPopover.hide();
+        self.changePasswordModal.init($scope)
+            .then(function(modal) {
+                modal.show();
+            });
+    };
+})
+
 /*
  * This is the controller for the abstract "app" state--the one the tabs are loaded with.
  */
-.controller('AppCtrl', function($scope, $ionicModal, $state, authService, locationService) {
-    $scope.locations = locationService.list();
-
+.controller('AppCtrl', function($scope, $ionicModal, $state, authService) {
     $scope.logout = function logout() {
         // TODO: Clean up data.
         $state.go('login');
+        // TODO: authService.logout();
     };
 
     $scope.getCurrentLocation = function getCurrentLocation() {
@@ -46,29 +87,20 @@ angular.module('produce.controllers', [])
      * Select location modal--All transactions have to be associated with a location. This will get their location.
      * This can only happen after authentication.
      */
-
-    $scope.pickedLocation = null;
-
-    $ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
-        scope: $scope
-    }).then(function initPickLocationModal(modal) {
-        $scope.pickLocationModal = modal;
-    }).then(function verifyLocationSelected() {
+    //$ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
+    //    scope: $scope
+    //}).then(function initPickLocationModal(modal) {
+    //    $scope.pickLocationModal = modal;
+    //}).then(function verifyLocationSelected() {
         // On first entry, set the location
         // TODO: Switch to "$ionicView.enter"?
-        if (!$scope.getCurrentLocation()) {
-            $scope.showPickLocation();
-        }
-    });
+        //if (!$scope.getCurrentLocation()) {
+        //    $scope.showPickLocation();
+        //}
+    //});
 
-    $scope.closePickLocation = function closePickLocation() {
-        authService.setCurrentLocation($scope.pickedLocation);
-        $scope.pickedLocation = null;
-        $scope.pickLocationModal.hide();
-    };
-
+    // TODO: Replace with new model when we want to turn this back on.
     $scope.showPickLocation = function showPickLocation() {
-        $scope.pickLocationModal.show();
     };
 })
 
@@ -239,26 +271,23 @@ angular.module('produce.controllers', [])
  * The biggest chunk--managing the shopping cart--all client side. Nothing sent to server until sale is completed.
  * Not intended to be a persistent shopping cart.
  */
-.controller('CartController', function($scope, $ionicModal, itemService, cartService, authService) {
+    // TODO: Get rid of $timeout when through playing.
+.controller('CartController', function($scope, $state, $ionicModal, $ionicPopup, $timeout, itemService, cartService, authService) {
+    var self = this;
+
     $scope.items = itemService.list();
     $scope.cart = cartService.getCurrentCart();
 
     $scope.cartTotal = 0.00;
 
-    // Clear the cart
-    $scope.emptyCart = function emptyCart() {
-        cartService.emptyCart();
-        $scope.cartTotal = 0.00;
-    };
-
     // Compute the subtotal for an item in the cart, then recompute the total.
-    $scope.doSubtotal = function doSubtotal(cartItem) {
+    this.doSubtotal = function doSubtotal(cartItem) {
         cartItem.subtotal = cartItem.item.unitPrice * cartItem.quantity;
-        $scope.doTotal();
+        self.doTotal();
     };
 
     // Total up all of the items in the cart.
-    $scope.doTotal = function doTotal() {
+    this.doTotal = function doTotal() {
         var total = 0.00;
         for (var i = 0; i < $scope.cart.length; ++i) {
             total += $scope.cart[i].subtotal;
@@ -266,17 +295,23 @@ angular.module('produce.controllers', [])
         $scope.cartTotal = total;
     };
 
+    // Clear the cart
+    $scope.emptyCart = function emptyCart() {
+        cartService.emptyCart();
+        $scope.cartTotal = 0.00;
+    };
+
     // Increment the quantity of an item in the cart by 1, then recompute prices.
     $scope.incrementQuantity = function incrementQuantity(i) {
         ++$scope.cart[i].quantity;
-        $scope.doSubtotal($scope.cart[i]);
+        self.doSubtotal($scope.cart[i]);
     };
 
     // Decrement the quantity of an item in the cart by 1, then recompute prices.
     $scope.decrementQuantity = function decrementQuantity(i) {
         if (($scope.cart[i].quantity - 1) >= 0) {
             --$scope.cart[i].quantity;
-            $scope.doSubtotal($scope.cart[i]);
+            self.doSubtotal($scope.cart[i]);
         }
         // TODO: Ask to delete item if 0?
     };
@@ -284,23 +319,33 @@ angular.module('produce.controllers', [])
     // Increment the quantity of an item in the cart by .1, then recompute prices.
     $scope.incrementQuantityTenths = function incrementQuantityTenths(i) {
         $scope.cart[i].quantity += .1;
-        $scope.doSubtotal($scope.cart[i]);
+        self.doSubtotal($scope.cart[i]);
     };
 
     // Decrement the quantity of an item in the cart by .1, then recompute prices.
     $scope.decrementQuantityTenths = function decrementQuantityTenths(i) {
         if (($scope.cart[i].quantity - .1) >= 0) {
             $scope.cart[i].quantity -= .1;
-            $scope.doSubtotal($scope.cart[i]);
+            self.doSubtotal($scope.cart[i]);
         }
-        // TODO: Ask to delete item if 0?
     };
 
+    $scope.confirmDelete = function confirmDelete(cartItem) {
+        var confirmPopup = $ionicPopup.confirm({
+            title: 'Delete from cart',
+            template: 'Are you sure you want to delete ' + cartItem.item.name + ' from the cart?'
+        });
+        confirmPopup.then(function(res) {
+            if (res) {
+                cartService.removeFromCart(cartItem);
+            }
+        });
+    };
 
     // Initial entry.
     // TODO: This goes away after "play" mode is over.
     for (var i = 0; i < $scope.cart.length; ++i) {
-        $scope.doSubtotal($scope.cart[i]);
+        self.doSubtotal($scope.cart[i]);
     }
 
     /*
@@ -310,52 +355,139 @@ angular.module('produce.controllers', [])
     $ionicModal.fromTemplateUrl('templates/modal.add-cart-item.html', {
         scope: $scope
     }).then(function initAddItemModal(modal) {
-        $scope.addItemModal = modal;
+        self.addItemModal = modal;
     });
 
     // Close the modal.
     $scope.closeAddItem = function closeAddItem() {
-        $scope.addItemModal.hide();
+        self.addItemModal.hide();
     };
 
     // Show the modal
     $scope.showAddItem = function showAddItem() {
-        $scope.addItemModal.show();
+        self.addItemModal.show();
     };
 
     // Add an item to the cart.
     $scope.addItemToCart = function addItemToCart(item) {
         // Quantity initialized to zero--may be off a scale.
         // Make a copy of the item so that it doesn't change price during the sale.
-        $scope.cart.push({ item: angular.copy(item), quantity: 0, subTotal: 0.00});
-        $scope.doSubtotal($scope.cart[$scope.cart.length - 1]);
+        // TODO: Put this construction into the service.
+        cartService.addItemToCart({ item: angular.copy(item), quantity: 0, subTotal: 0.00});
+        self.doSubtotal($scope.cart[$scope.cart.length - 1]);
         $scope.closeAddItem();
     };
 
     /*
-     * Sale completion modal
+     * Check Out modal
      */
-
-    $scope.amountTendered = 0;
-    $scope.changeGiven = 0;
-    $scope.collectedTotal = 0;
 
     $ionicModal.fromTemplateUrl('templates/modal.checkout.html', {
         scope: $scope
     }).then(function initCheckOutModal(modal) {
-        $scope.checkOutModal = modal;
+        self.checkOutModal = modal;
     });
 
     // Close the modal
     $scope.closeCheckOut = function closeCheckOut() {
-        $scope.checkOutModal.hide();
-        cartService.save(authService.getUser(), $scope.cart, $scope.collectedTotal);
+        self.checkOutModal.hide();
+    };
+
+    // TODO: Dupe functionality
+    $scope.checkOut = function checkOut() {
+        $scope.closeCheckOut();
+        // TODO: Add location below.
+        cartService.save(authService.getUser(), authService.getCurrentLocation(), $scope.cart, $scope.checkoutData.amountTendered - $scope.checkoutData.changeGiven);
         $scope.emptyCart();
     };
 
     // Show the modal
     $scope.showCheckOut = function showCheckOut() {
-        $scope.checkOutModal.show();
+        self.checkOutModal.show();
+        $state.go($scope.steps[$scope.currentStep].current.state);
     };
-    // TODO: Complete the sale--give the cart to the service.
+
+    // TODO: Control this in the promise from the service.
+    $scope.stillSaving = false;
+    $scope.completeSale = function completeSale() {
+        $scope.stillSaving = true;
+        $timeout(function() {
+            $scope.stillSaving = false;
+            $timeout(function() {
+                // TODO: Re-init values accumulated during checkout.
+                $scope.closeCheckOut();
+                // TODO: Do the re-init after the window has closed.
+                $scope.currentStep = 0;
+                $state.go($scope.steps[$scope.currentStep].current.state);
+            }, 2000);
+        }, 3000);
+        self.initCheckoutData();
+    };
+
+    // These are all properties that will be used by the modal. They are defined here so that the CheckoutController
+    // can access them through its several states.
+    $scope.checkoutData = {
+        amountTendered : 0,
+        changeGiven: 0
+    };
+
+    this.initCheckoutData = function() {
+        $scope.checkoutData.amountTendered = 0;
+        $scope.checkoutData.changeGiven = 0;
+    };
+
+    /*
+     * State movement
+     */
+    this.states = [
+        null,
+        { name: 'Collect Money', state: 'app.cart.tenderMoney' },
+        { name: 'Give Change', state: 'app.cart.handleChange' },
+        { name: 'Complete Sale', state: 'app.cart.completeSale'},
+        null
+    ];
+
+    $scope.steps = [];
+    for (var j = 1; j < (this.states.length - 1); ++j) {
+        $scope.steps.push({ previous: this.states[j - 1], current: this.states[j], next: this.states[j + 1] });
+    }
+
+    $scope.currentStep = 0;
+
+    $scope.nextStep = function nextStep() {
+        if ($scope.steps.length > ($scope.currentStep + 1)) {
+            ++$scope.currentStep;
+            $state.go($scope.steps[$scope.currentStep].current.state);
+        }
+    };
+
+    $scope.previousStep = function previousStep() {
+        if (-1 < ($scope.currentStep - 1)) {
+            --$scope.currentStep;
+            $state.go($scope.steps[$scope.currentStep].current.state);
+        }
+    };
+})
+
+.controller('CheckoutController', function($scope) {
+    $scope.addTendered = function addTendered(amt) {
+        $scope.checkoutData.amountTendered += amt;
+    };
+
+    $scope.setTendered = function setTendered(amt) {
+        $scope.checkoutData.amountTendered = amt;
+    };
+
+    $scope.clearTendered = function clearTendered() {
+        $scope.checkoutData.amountTendered = 0.0;
+    };
+
+    $scope.changeDue = function changeDue() {
+        var due = $scope.checkoutData.amountTendered - $scope.cartTotal;
+        return (0 > due) ? 0 : due;
+    };
+
+    $scope.setChangeGiven = function setChangeGiven(amt) {
+        $scope.checkoutData.changeGiven = amt;
+    };
 });

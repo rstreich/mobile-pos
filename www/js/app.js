@@ -110,7 +110,41 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
                 controller: 'CartController'
             }
         }
+    })
+
+    .state('app.cart.tenderMoney', {
+        url: "",
+        cache: false,
+        views: {
+            'checkout@': {
+                templateUrl: "part.tender-money.html",
+                controller: 'CheckoutController'
+            }
+        }
+    })
+
+    .state('app.cart.handleChange', {
+        url: "",
+        cache: false,
+        views: {
+            'checkout@': {
+                templateUrl: "part.handle-change.html",
+                controller: 'CheckoutController'
+            }
+        }
+    })
+
+    .state('app.cart.completeSale', {
+        url: "",
+        cache: false,
+        views: {
+            'checkout@': {
+                templateUrl: "part.complete-sale.html",
+                controller: 'CheckoutController'
+            }
+        }
     });
+
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/login');
 });

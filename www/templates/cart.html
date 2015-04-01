@@ -1,16 +1,14 @@
 <ion-view view-title="Current Sale">
     <ion-nav-buttons side="right">
         <button class="button button-clear icon ion-plus" ng-click="showAddItem()"></button>
-        <!--<button class="button button-clear icon icon-right ion-ios-arrow-forward"><a ui-sref="cart.summary">Summary</a></button>-->
     </ion-nav-buttons>
     <ion-content class="padding">
         <ion-slide-box>
             <ion-slide>
                 <div class="catalog-box" ng-model="cart">
                     <div class="cart-box card" ng-repeat="cartItem in cart">
-                        <div class="catalog-item">
+                        <div class="catalog-item" on-hold="confirmDelete(cartItem)">
                             <img class="catalog-item-img" ng-src="/img/items/{{cartItem.item.image}}">
-
                             <div class="catalog-item-text">{{cartItem.item.name}}</div>
                             <div class="catalog-item-text">@${{cartItem.item.unitPrice | number:2}} {{cartItem.item.uom.name}}
                             </div>
@@ -43,14 +41,12 @@
                 </div>
             </ion-slide>
         </ion-slide-box>
-    </ion-content>
-    <ion-footer-bar class="bar-footer bar-stable">
-        <div class="col-20 centering-box">
+        <div class="button-bar">
             <button class="button button-positive" ng-click="emptyCart()">Empty Cart</button>
-        </div>
-        <div class="col-20 centering-box">
             <button class="button button-positive" ng-click="showCheckOut()">Check Out</button>
         </div>
+    </ion-content>
+    <ion-footer-bar class="bar-footer bar-stable">
         <div class="col y-centering-box right-align-box" style="font-size: 1.8em">Total: ${{cartTotal | number:2}}</div>
     </ion-footer-bar>
 </ion-view>

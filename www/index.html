@@ -15,6 +15,9 @@
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
 
+    <!-- currency handling -->
+    <script src="lib/big.min.js"></script>
+
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
@@ -24,8 +27,11 @@
     <script src="js/services.js"></script>
 </head>
 
-<body ng-app="produce">
+<body ng-app="produce" ng-controller="IndexController">
 <ion-nav-bar class="bar-positive">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon ion-more" ng-show="isAuthenticated()" ng-click="userInfoPopover.show($event)"></button>
+    </ion-nav-buttons>
 </ion-nav-bar>
 <ion-nav-view></ion-nav-view>
 </body>

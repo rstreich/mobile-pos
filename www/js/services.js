@@ -1,7 +1,11 @@
 angular.module('produce.services', [])
 
-.service('authService', function($http) {
-    this.user = null;
+.service('authService', function($http, $ionicModal, locationService, userService) {
+    var self = this;
+
+    // TODO: Remove after building out popover.
+    this.user = { id: 1, name: 'robert', isAdmin: true, isActive: true };
+
     // It's arguable that this belongs here, but the location is required to log in, so....
     this.currentLocation = null;
 
@@ -14,9 +18,9 @@ angular.module('produce.services', [])
 
     this.getCurrentLocation = function getCurrentLocation() {
         if (!this.currentLocation) {
-            return '';
+            return null;
         }
-        return this.currentLocation.name;
+        return this.currentLocation;
     };
 
     this.setCurrentLocation = function setCurrentLocation(location) {
@@ -35,7 +39,12 @@ angular.module('produce.services', [])
     };
 
     this.login = function login(username, password) {
-        this.user = { id: 1, name: username, isActive: true, isAdmin: username === 'admin' };
+        // TODO: Real login
+        this.user = {id: 1, name: username, isActive: true, isAdmin: username === 'admin'};
+    };
+
+    this.changePasswordModal = function changePassword(password) {
+        userService.save({ id: user.id, password: password });
     };
 
     this.logout = function logout(id) {
@@ -45,6 +54,87 @@ angular.module('produce.services', [])
             this.user = null;
         }
         this.currentLocation = null;
+    };
+
+    /*
+     * Change password modal
+     */
+    this.getChangePasswordModal = function getChangePasswordModal() {
+        var service = self;
+        var ionicModal = $ionicModal;
+
+        var init = function initPickLocationModal($scope) {
+            var myScope = $scope.$new(false, $scope);
+            myScope.data = { password: null, confirmPassword: null };
+
+            var promise = ionicModal.fromTemplateUrl('templates/modal.change-password.html', {
+                scope: myScope
+            }).then(function (modal) {
+                myScope.modal = modal;
+                return modal;
+            });
+
+            myScope.closeModal = function closeModal(save) {
+                if (save) {
+                    service.changePasswordModal(myScope.data.password);
+                }
+                myScope.modal.hide();
+                myScope.data.pickedLocation = null;
+            };
+
+            myScope.$on('$destroy', function () {
+                $scope.modal.remove();
+            });
+
+            return promise;
+        };
+
+        return {
+            init: init
+        };
+    };
+
+    /*
+     * Select location modal--All transactions have to be associated with a location. This will get their location
+     * and set it on the service.
+     *
+     * This can only happen after authentication.
+     */
+    this.getLocationModal = function getLocationModal() {
+        var service = self;
+        var ionicModal = $ionicModal;
+        var locService = locationService;
+
+        var init = function initPickLocationModal($scope) {
+            var myScope = $scope.$new(false, $scope);
+            myScope.locations = locService.list();
+            myScope.data = {};
+            myScope.data.pickedLocation = { id: 23, name: 'Bumfuck, Egypt' };
+
+            var promise = ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
+                scope: myScope
+                //animation: 'slide-in-up'
+            }).then(function (modal) {
+                myScope.modal = modal;
+                return modal;
+            });
+
+            myScope.closeModal = function closeModal() {
+                service.setCurrentLocation(myScope.data.pickedLocation);
+                myScope.modal.hide();
+                myScope.data.pickedLocation = null;
+            };
+
+            myScope.$on('$destroy', function () {
+                $scope.modal.remove();
+            });
+
+            return promise;
+        };
+
+        return {
+            init: init
+        };
     };
 })
 
@@ -62,14 +152,14 @@ angular.module('produce.services', [])
         return users;
     };
 
-    this.get = function(id) {
+    this.get = function get(id) {
         if (id <= users.length) {
             return users[id - 1];
         }
         return null;
     };
 
-    this.save = function get(user) {
+    this.save = function save(user) {
         // Insert
         if (! user.id) {
             user.id = users.length;
@@ -179,30 +269,42 @@ angular.module('produce.services', [])
     }
 })
 
+// TODO: Get rid of ItemService as a dependency
 .service('cartService', function($http, $q, itemService) {
-    var items = itemService.list();
+    this.items = itemService.list();
 
-    var cart = [
-        { item: items[2], quantity: 1, subtotal: 0.00},
-        { item: items[3], quantity: 1, subtotal: 0.00},
-        { item: items[4], quantity: 1, subtotal: 0.00},
-        { item: items[5], quantity: 1, subtotal: 0.00},
-        { item: items[6], quantity: 1, subtotal: 0.00},
-        { item: items[7], quantity: 1, subtotal: 0.00},
-        { item: items[8], quantity: 1, subtotal: 0.00},
-        { item: items[9], quantity: 1, subtotal: 0.00},
-        { item: items[10], quantity: 1, subtotal: 0.00}
+    this.cart = [
+        { item: this.items[2], quantity: 1, subtotal: 0.00},
+        { item: this.items[3], quantity: 1, subtotal: 0.00},
+        { item: this.items[4], quantity: 1, subtotal: 0.00},
+        { item: this.items[5], quantity: 1, subtotal: 0.00},
+        { item: this.items[6], quantity: 1, subtotal: 0.00},
+        { item: this.items[7], quantity: 1, subtotal: 0.00},
+        { item: this.items[8], quantity: 1, subtotal: 0.00},
+        { item: this.items[9], quantity: 1, subtotal: 0.00},
+        { item: this.items[10], quantity: 1, subtotal: 0.00}
     ];
 
+    this.addItemToCart = function addItemToCart(item) {
+        this.cart.push(item);
+    };
+
     this.getCurrentCart = function getCurrentCart() {
-        return cart;
+        return this.cart;
+    };
+
+    this.removeFromCart = function removeFromCart(cartItem) {
+        var i = this.cart.indexOf(cartItem);
+        if (-1 < i) {
+            this.cart.splice(i, 1);
+        }
     };
 
     this.emptyCart = function emptyCart() {
-        cart.splice(0, cart.length);
+        this.cart.splice(0, cart.length);
     };
 
-    this.save = function save(user, cart, totalCollected) {
+    this.save = function save(user, location, cart, totalCollected) {
     }
 });
 

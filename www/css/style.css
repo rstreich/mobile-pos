@@ -1,3 +1,16 @@
+.variable-text {
+    color: red;
+}
+
+ion-popover-view.fit {
+    height: auto !important;
+    width: auto; !important
+}
+
+ion-popover-view.fit ion-content {
+    position: relative !important;
+}
+
 .centering-box {
     display: -webkit-flex;
     -webkit-align-items: center;
@@ -258,15 +271,109 @@
 }
 
 /*
+ *
+ */
+.checkout-box {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    align-items: stretch;
+    -webkit-align-items: stretch;
+    flex: 1 0 auto;
+    margin: 5px;
+    border: 1px solid lightgray;
+}
+
+.checkout-row {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: space-around;
+    -webkit-justify-content: space-around;
+    align-content: center;
+    -webkit-align-content: center;
+    align-items: center;
+    -webkit-align-items: center;
+    flex: 1 0 auto;
+    margin: 5px;
+}
+
+.checkout-col {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    align-items: stretch;
+    -webkit-align-items: stretch;
+    flex: 1 0 auto;
+    margin: 5px;
+}
+
+.checkout-button-col {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    align-items: center;
+    -webkit-align-items: center;
+    flex: 1 0 auto;
+    margin: 5px;
+}
+
+.checkout-total {
+    font-size: 1.25em;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    align-content: center;
+    -webkit-align-content: center;
+    align-items: center;
+    -webkit-align-items: center;
+    flex: 1 0 auto;
+    margin: 5px;
+}
+
+.money-button {
+    display: inline-block;
+    outline: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    margin: 15px;
+    font-size: 1.25em;
+    padding: .5em 1em .5em;
+    color: white;
+    background-color: forestgreen;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+}
+
+.money-button:hover {
+    text-decoration: none;
+}
+.money-button:active {
+    position: relative;
+    top: 1px;
+}
+
+/*
  * Input styles--PITA to override ionic
  */
 
+input#dollars {
+    height: 2.25em;
+    font-size: 1em;
+    text-align: right;
+    width: 8em;
+}
+
 input#edit-text, input#dollars {
-    /* display: block; */
-    height: 34px;
     padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.428571429;
     color: #555555;
     vertical-align: middle;
     background-color: #ffffff;
@@ -286,12 +393,10 @@ input#edit-text:focus, input#dollars:focus {
 }
 
 input#edit-text {
+    font-size: 14px;
+    height: 34px;
+    line-height: 1.428571429;
     width: 100%;
-}
-
-input#dollars {
-    text-align: right;
-    width: 8em;
 }
 
 input#edit-text.ng-invalid.ng-dirty, input#dollars.ng-invalid.ng-dirty {
