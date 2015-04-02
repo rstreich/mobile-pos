@@ -11,20 +11,24 @@
                 <div class="item property-row">
                     <div class="property-label">Name:</div>
                     <div class="property-value-text">
-                        <input id="edit-text" size="20" maxlength="20" type="text" required ng-model="editItem.name">
+                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="editItem.name">
                     </div>
+                    <span ng-show="itemForm.name.$error.required" class="required-hint"></span>
                 </div>
                 <div class="item property-row">
                     <div class="property-label">Unit Price:</div>
                     <div class="property-value-text">
-                        <input id="dollars" type="number" required ng-model="editItem.unitPrice">
+                        <input id="dollars" name="unitPrice" type="number" required ng-model="editItem.unitPrice">
                     </div>
+                    <span ng-show="itemForm.unitPrice.$error.required" class="required-hint"></span>
+                    <span ng-show="itemForm.unitPrice.$error.number" class="form-error">Numbers only.</span>
                 </div>
                 <div class="item property-row">
                     <div class="property-label">Units:</div>
                     <div class="property-value-text">
-                        <select ng-options="uom.name for uom in uoms track by uom.id" required ng-model="editItem.uom"></select>
+                        <select name="uom" ng-options="uom.name for uom in uoms track by uom.id" required ng-model="editItem.uom"></select>
                     </div>
+                    <span ng-show="itemForm.uom.$error.required" class="required-hint"></span>
                 </div>
                 <div class="item property-row">
                     <div class="property-label">Is Active:</div>

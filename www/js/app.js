@@ -25,6 +25,26 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
     }
 })
 
+.directive("compareTo", function() {
+    return {
+        require: "ngModel",
+        scope: {
+            otherModelValue: "=compareTo"
+        },
+        link: function(scope, element, attributes, ngModel) {
+            if (ngModel) {
+                ngModel.$validators.compareTo = function(modelValue) {
+                    return modelValue === scope.otherModelValue;
+                };
+
+                scope.$watch("otherModelValue", function() {
+                    ngModel.$validate();
+                });
+            }
+        }
+    };
+})
+
 .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
 

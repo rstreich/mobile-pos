@@ -265,9 +265,35 @@ ion-popover-view.fit ion-content {
     -webkit-align-items: center;
 }
 
-.edit-info {
+/* TODO: Get these aligned better */
+.edit-info, .form-error, .required-hint {
     font-size: .8em;
+    margin-left: 1em;
+    line-height: 2em;
+}
+.edit-info {
     color: lightslategray;
+}
+
+.form-error {
+    color: red;
+}
+
+div.form-error {
+    display: block;
+}
+
+span.form-error {
+    display: inline;
+}
+
+.required-hint {
+    display: inline;
+    color: indianred;
+}
+
+.required-hint:after {
+    content: ' (Required)';
 }
 
 /*

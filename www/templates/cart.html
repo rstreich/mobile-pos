@@ -1,10 +1,12 @@
 <ion-view view-title="Current Sale">
     <ion-nav-buttons side="right">
+        <button ng-show="cartData.summarySlide" class="button button-icon icon ion-ios-minus-outline" style="margin-right: 10px"
+                ng-click="cartData.showDelete = !cartData.showDelete"></button>
         <button class="button button-clear icon ion-plus" ng-click="showAddItem()"></button>
     </ion-nav-buttons>
     <ion-content class="padding">
-        <ion-slide-box>
-            <ion-slide>
+        <ion-slide-box on-slide-changed="slideChanged($index)">
+            <ion-slide class="padding">
                 <div class="catalog-box" ng-model="cart">
                     <div class="cart-box card" ng-repeat="cartItem in cart">
                         <div class="catalog-item" on-hold="confirmDelete(cartItem)">
@@ -15,16 +17,16 @@
                         </div>
                         <div class="quantity-selector-box">
                             <div class="quantity-selector-button-box">
-                                <button ng-model="cartItem.quantity" ng-click="incrementQuantity($index)"
+                                <button ng-click="incrementQuantity($index)"
                                         class="button button-clear ion-plus-circled quantity-selector-button"></button>
-                                <button ng-model="cartItem.quantity" ng-click="incrementQuantityTenths($index)"
+                                <button ng-click="incrementQuantityTenths($index)"
                                         class="button button-clear ion-plus-circled quantity-selector-button"></button>
                             </div>
                             <div class="quantity-selector-qty">{{cartItem.quantity | number:2}}</div>
                             <div class="quantity-selector-button-box">
-                                <button ng-model="cartItem.quantity" ng-click="decrementQuantity($index)"
+                                <button ng-click="decrementQuantity($index)"
                                         class="button button-clear ion-minus-circled quantity-selector-button"></button>
-                                <button ng-model="cartItem.quantity" ng-click="decrementQuantityTenths($index)"
+                                <button ng-click="decrementQuantityTenths($index)"
                                         class="button button-clear ion-minus-circled quantity-selector-button"></button>
                             </div>
                             <div class="quantity-selector-subtotal">${{cartItem.subtotal | number:2}}</div>
@@ -32,17 +34,18 @@
                     </div>
                 </div>
             </ion-slide>
-            <ion-slide>
-                <div class="list">
-                    <div class="row item" ng-repeat="cartItem in cart">
+            <ion-slide class="padding">
+                <ion-list show-delete="cartData.showDelete">
+                    <ion-item class="row" ng-repeat="cartItem in cart">
                         <div class="col y-centering-box">{{cartItem.quantity}} {{cartItem.item.uom.name}} {{cartItem.item.name}}</div>
                         <div class="col-20 y-centering-box right-align-box">${{cartItem.subtotal | number:2}}</div>
-                    </div>
-                </div>
+                        <ion-delete-button class="ion-minus-circled" ng-click="removeFromCart(cartItem)">
+                    </ion-item>
+                </ion-list>
             </ion-slide>
         </ion-slide-box>
-        <div class="button-bar">
-            <button class="button button-positive" ng-click="emptyCart()">Empty Cart</button>
+        <div class="button-bar" ng-show="cart.length">
+            <button class="button button-assertive" ng-click="emptyCart()">Empty Cart</button>
             <button class="button button-positive" ng-click="showCheckOut()">Check Out</button>
         </div>
     </ion-content>

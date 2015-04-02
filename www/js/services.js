@@ -1,13 +1,10 @@
 angular.module('produce.services', [])
 
 .service('authService', function($http, $ionicModal, locationService, userService) {
-    var self = this;
-
-    // TODO: Remove after building out popover.
-    this.user = { id: 1, name: 'robert', isAdmin: true, isActive: true };
-
     // It's arguable that this belongs here, but the location is required to log in, so....
     this.currentLocation = null;
+    // TODO: Make go away when through playing.
+    this.user = { id: 1, name: 'Robert', isActive: true, isAdmin: true };
 
     this.getUser = function getUser() {
         if (!this.user) {
@@ -60,7 +57,7 @@ angular.module('produce.services', [])
      * Change password modal
      */
     this.getChangePasswordModal = function getChangePasswordModal() {
-        var service = self;
+        var service = this;
         var ionicModal = $ionicModal;
 
         var init = function initPickLocationModal($scope) {
@@ -101,7 +98,7 @@ angular.module('produce.services', [])
      * This can only happen after authentication.
      */
     this.getLocationModal = function getLocationModal() {
-        var service = self;
+        var service = this;
         var ionicModal = $ionicModal;
         var locService = locationService;
 
@@ -139,7 +136,7 @@ angular.module('produce.services', [])
 })
 
 .service('userService', function($http, $q) {
-    var users = [
+    this.users = [
         { id: 1, name: 'robert', isAdmin: true, isActive: true },
         { id: 2, name: 'garvey', isAdmin: true, isActive: true },
         { id: 3, name: 'chelsie', isAdmin: false, isActive: true },
@@ -149,12 +146,12 @@ angular.module('produce.services', [])
     ];
 
     this.list = function list() {
-        return users;
+        return this.users;
     };
 
     this.get = function get(id) {
-        if (id <= users.length) {
-            return users[id - 1];
+        if (id <= this.users.length) {
+            return this.users[id - 1];
         }
         return null;
     };
@@ -162,8 +159,8 @@ angular.module('produce.services', [])
     this.save = function save(user) {
         // Insert
         if (! user.id) {
-            user.id = users.length;
-            users.push(user);
+            user.id = this.users.length;
+            this.users.push(user);
         } else {
             // TODO: Copy data over.
         }
@@ -171,7 +168,7 @@ angular.module('produce.services', [])
 })
 
 .service('locationService', function($http, $q) {
-    var locations = [
+    this.locations = [
         { id: 1, name: 'Fargo'},
         { id: 2, name: 'Moorhead'},
         { id: 3, name: 'Your place'},
@@ -180,12 +177,12 @@ angular.module('produce.services', [])
     ];
 
     this.list = function list() {
-        return locations;
+        return this.locations;
     };
 
     this.get = function get(id) {
-        if (id <= locations.length) {
-            return locations[id - 1];
+        if (id <= this.locations.length) {
+            return this.locations[id - 1];
         }
         return null;
     };
@@ -193,8 +190,8 @@ angular.module('produce.services', [])
     this.save = function save(location) {
         // Insert
         if (!location.id) {
-            location.id = locations.length;
-            locations.push(location);
+            location.id = this.locations.length;
+            this.locations.push(location);
         } else {
             // TODO: Copy data over.
         }
@@ -202,7 +199,7 @@ angular.module('produce.services', [])
 })
 
 .service('uomService', function($http, $q) {
-    var uoms = [
+    this.uoms = [
         { id: 1, name: 'each'},
         { id: 2, name: 'lb.'},
         { id: 3, name: 'dozen'},
@@ -211,12 +208,12 @@ angular.module('produce.services', [])
     ];
 
     this.list = function list() {
-        return uoms;
+        return this.uoms;
     };
 
     this.get = function get(id) {
-        if (id <= uoms.length) {
-            return uoms[id - 1];
+        if (id <= this.uoms.length) {
+            return this.uoms[id - 1];
         }
         return null;
     };
@@ -224,8 +221,8 @@ angular.module('produce.services', [])
     this.save = function save(uom) {
         // Insert
         if (! uom.id) {
-            uom.id = uoms.length;
-            uoms.push(uom);
+            uom.id = this.uoms.length;
+            this.uoms.push(uom);
         } else {
             // TODO: Copy data over.
         }
@@ -233,7 +230,7 @@ angular.module('produce.services', [])
 })
 
 .service('itemService', function($http, $q) {
-    var items = [
+    this.items = [
         {id: 1, name: 'Discount', uom: { id: 1, name: 'each' }, unitPrice: 1.00, isActive: true, image: 'discount.png'},
         {id: 2, name: 'Donation', uom: { id: 1, name: 'each' }, unitPrice: 1.00, isActive: true, image: 'donation.png'},
         {id: 3, name: 'Asparagus', uom: { id: 2, name: 'lb.' }, unitPrice: 2.34, isActive: true, image: 'asparagus.png'},
@@ -248,12 +245,12 @@ angular.module('produce.services', [])
     ];
 
     this.list = function list() {
-        return items;
+        return this.items;
     };
 
     this.get = function get(id) {
-        if (id <= items.length) {
-            return items[id - 1];
+        if (id <= this.items.length) {
+            return this.items[id - 1];
         }
         return null;
     };
@@ -261,8 +258,8 @@ angular.module('produce.services', [])
     this.save = function save(item) {
         // Insert
         if (! item.id) {
-            item.id = items.length;
-            items.push(item);
+            item.id = this.items.length;
+            this.items.push(item);
         } else {
             // TODO: Nothing now. Item was edited.
         }
@@ -271,18 +268,18 @@ angular.module('produce.services', [])
 
 // TODO: Get rid of ItemService as a dependency
 .service('cartService', function($http, $q, itemService) {
-    this.items = itemService.list();
+    var items = itemService.list();
 
     this.cart = [
-        { item: this.items[2], quantity: 1, subtotal: 0.00},
-        { item: this.items[3], quantity: 1, subtotal: 0.00},
-        { item: this.items[4], quantity: 1, subtotal: 0.00},
-        { item: this.items[5], quantity: 1, subtotal: 0.00},
-        { item: this.items[6], quantity: 1, subtotal: 0.00},
-        { item: this.items[7], quantity: 1, subtotal: 0.00},
-        { item: this.items[8], quantity: 1, subtotal: 0.00},
-        { item: this.items[9], quantity: 1, subtotal: 0.00},
-        { item: this.items[10], quantity: 1, subtotal: 0.00}
+        { item: items[2], quantity: 1, subtotal: 0.00},
+        { item: items[3], quantity: 1, subtotal: 0.00},
+        { item: items[4], quantity: 1, subtotal: 0.00},
+        { item: items[5], quantity: 1, subtotal: 0.00},
+        { item: items[6], quantity: 1, subtotal: 0.00},
+        { item: items[7], quantity: 1, subtotal: 0.00},
+        { item: items[8], quantity: 1, subtotal: 0.00},
+        { item: items[9], quantity: 1, subtotal: 0.00},
+        { item: items[10], quantity: 1, subtotal: 0.00}
     ];
 
     this.addItemToCart = function addItemToCart(item) {
@@ -301,10 +298,10 @@ angular.module('produce.services', [])
     };
 
     this.emptyCart = function emptyCart() {
-        this.cart.splice(0, cart.length);
+        this.cart.splice(0, this.cart.length);
     };
 
-    this.save = function save(user, location, cart, totalCollected) {
+    this.save = function save(user, location, totalCollected) {
     }
 });
 

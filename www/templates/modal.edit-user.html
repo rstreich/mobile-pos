@@ -11,17 +11,20 @@
                 <div class="item property-row">
                     <div class="property-label">Name:</div>
                     <div class="property-value-text">
-                        <input id="edit-text" size="20" maxlength="20" type="text" required ng-model="editUser.name">
+                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="editUser.name">
                     </div>
+                    <span ng-show="userForm.name.$error.required" class="required-hint"></span>
                 </div>
                 <div class="item property-row">
                     <div class="property-label">Password: </div>
                     <div class="property-value-text">
                         <div class="y-centering-box">
-                            <input id="edit-text" size="20" minlength="8" type="text" ng-required="pwdRequired" ng-model="editUser.pwd">
-                            <span class="edit-info" ng-if="!pwdRequired"> (Current password not shown)</span>
+                            <input name="password" id="edit-text" ng-model-options="{ debounce: 750 }" size="20" minlength="8" type="text" ng-required="pwdRequired" ng-model="editUser.pwd">
                         </div>
                     </div>
+                    <span class="edit-info" ng-show="!(pwdRequired || userForm.password.$dirty)"> (Current password not shown)</span>
+                    <span ng-show="userForm.password.$error.required" class="required-hint"></span>
+                    <span ng-show="userForm.password.$error.minlength" class="form-error">Password must be at least eight characters.</span>
                 </div>
                 <div class="item property-row">
                     <div class="property-label">Is Active:</div>

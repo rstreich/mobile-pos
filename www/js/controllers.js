@@ -278,6 +278,8 @@ angular.module('produce.controllers', [])
     $scope.items = itemService.list();
     $scope.cart = cartService.getCurrentCart();
 
+    $scope.cartData = { showDelete: false, summarySlide: false };
+
     $scope.cartTotal = 0.00;
 
     // Compute the subtotal for an item in the cart, then recompute the total.
@@ -295,10 +297,18 @@ angular.module('produce.controllers', [])
         $scope.cartTotal = total;
     };
 
+    $scope.slideChanged = function slideChanged(index) {
+        $scope.cartData.summarySlide = index === 1;
+    };
+
     // Clear the cart
     $scope.emptyCart = function emptyCart() {
         cartService.emptyCart();
         $scope.cartTotal = 0.00;
+    };
+
+    $scope.removeFromCart = function removeFromCart(cartItem) {
+        cartService.removeFromCart(cartItem);
     };
 
     // Increment the quantity of an item in the cart by 1, then recompute prices.
@@ -393,24 +403,21 @@ angular.module('produce.controllers', [])
         self.checkOutModal.hide();
     };
 
-    // TODO: Dupe functionality
-    $scope.checkOut = function checkOut() {
-        $scope.closeCheckOut();
-        // TODO: Add location below.
-        cartService.save(authService.getUser(), authService.getCurrentLocation(), $scope.cart, $scope.checkoutData.amountTendered - $scope.checkoutData.changeGiven);
-        $scope.emptyCart();
-    };
-
     // Show the modal
     $scope.showCheckOut = function showCheckOut() {
         self.checkOutModal.show();
         $state.go($scope.steps[$scope.currentStep].current.state);
     };
 
+    $scope.getTotalSale = function getTotalSale() {
+        return $scope.checkoutData.amountTendered - $scope.checkoutData.changeGiven;
+    };
+
     // TODO: Control this in the promise from the service.
     $scope.stillSaving = false;
     $scope.completeSale = function completeSale() {
         $scope.stillSaving = true;
+        cartService.save(authService.getUser(), authService.getCurrentLocation(), $scope.checkoutData.amountTendered - $scope.checkoutData.changeGiven);
         $timeout(function() {
             $scope.stillSaving = false;
             $timeout(function() {
@@ -418,10 +425,11 @@ angular.module('produce.controllers', [])
                 $scope.closeCheckOut();
                 // TODO: Do the re-init after the window has closed.
                 $scope.currentStep = 0;
+                self.initCheckoutData();
+                $scope.emptyCart();
                 $state.go($scope.steps[$scope.currentStep].current.state);
             }, 2000);
         }, 3000);
-        self.initCheckoutData();
     };
 
     // These are all properties that will be used by the modal. They are defined here so that the CheckoutController
