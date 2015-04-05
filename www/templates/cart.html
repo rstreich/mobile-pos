@@ -5,14 +5,14 @@
         <button class="button button-clear icon ion-plus" ng-click="showAddItem()"></button>
     </ion-nav-buttons>
     <ion-content class="padding">
-        <ion-slide-box on-slide-changed="slideChanged($index)">
+       <ion-slide-box on-slide-changed="slideChanged($index)">
             <ion-slide class="padding">
-                <div class="catalog-box" ng-model="cart">
+                <div class="catalog-box">
                     <div class="cart-box card" ng-repeat="cartItem in cart">
                         <div class="catalog-item" on-hold="confirmDelete(cartItem)">
                             <img class="catalog-item-img" ng-src="/img/items/{{cartItem.item.image}}">
                             <div class="catalog-item-text">{{cartItem.item.name}}</div>
-                            <div class="catalog-item-text">@${{cartItem.item.unitPrice | number:2}} {{cartItem.item.uom.name}}
+                            <div class="catalog-item-text">@{{cartItem.item.unitPrice | dollars:true}} {{cartItem.item.uom.name}}
                             </div>
                         </div>
                         <div class="quantity-selector-box">
@@ -29,7 +29,7 @@
                                 <button ng-click="decrementQuantityTenths($index)"
                                         class="button button-clear ion-minus-circled quantity-selector-button"></button>
                             </div>
-                            <div class="quantity-selector-subtotal">${{cartItem.subtotal | number:2}}</div>
+                            <div class="quantity-selector-subtotal">{{cartItem.subtotal | dollars:true}}</div>
                         </div>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                 <ion-list show-delete="cartData.showDelete">
                     <ion-item class="row" ng-repeat="cartItem in cart">
                         <div class="col y-centering-box">{{cartItem.quantity}} {{cartItem.item.uom.name}} {{cartItem.item.name}}</div>
-                        <div class="col-20 y-centering-box right-align-box">${{cartItem.subtotal | number:2}}</div>
+                        <div class="col-20 y-centering-box right-align-box">{{cartItem.subtotal | dollars:true}}</div>
                         <ion-delete-button class="ion-minus-circled" ng-click="removeFromCart(cartItem)">
                     </ion-item>
                 </ion-list>
@@ -50,6 +50,6 @@
         </div>
     </ion-content>
     <ion-footer-bar class="bar-footer bar-stable">
-        <div class="col y-centering-box right-align-box" style="font-size: 1.8em">Total: ${{cartTotal | number:2}}</div>
+        <div class="col y-centering-box right-align-box" style="font-size: 1.8em">Total: {{cartTotal | dollars:true}}</div>
     </ion-footer-bar>
 </ion-view>

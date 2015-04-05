@@ -1,11 +1,25 @@
 <ion-view view-title="Catalog">
   <ion-content>
       <div class="catalog-box">
+          <form name="bigForm" novalidate>
+              <div>Foo:</div>
+              <div dollar-input name="dollars" required ng-model="big.fooble"></div>
+              <span ng-show="bigForm.dollars.$error.big" class="form-error">Bad model data.</span>
+              <span ng-show="bigForm.dollars.$error.pattern" class="form-error">Numbers only.</span>
+              <span ng-show="bigForm.dollars.$error.required" class="form-error">Required.</span>
+          </form>
+          <span ng-show="!bigForm.$valid" class="form-error">Frack</span>
+      </div>
+
+      <button class="button button-positive" ng-click="whatAmI()">Click Me</button>
+      <button class="button button-positive" ng-click="setBig()">Set Me</button>
+      <p>Model: {{big.fooble | dollars:true}}</p>
+      <!--<div class="catalog-box">
           <div ng-repeat="item in items" class="catalog-item card">
               <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
               <div class="catalog-item-text">{{item.name}}</div>
-              <div class="catalog-item-text">${{item.unitPrice | number:2}} {{item.uom.name}}</div>
+              <div class="catalog-item-text">{{item.unitPrice | dollar:true}} {{item.uom.name}}</div>
           </div>
-      </div>
+      </div>-->
   </ion-content>
 </ion-view>

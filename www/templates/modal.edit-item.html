@@ -18,10 +18,10 @@
                 <div class="item property-row">
                     <div class="property-label">Unit Price:</div>
                     <div class="property-value-text">
-                        <input id="dollars" name="unitPrice" type="number" required ng-model="editItem.unitPrice">
+                        <div dollar-input name="unitPrice" required ng-model="editItem.unitPrice"></div>
                     </div>
                     <span ng-show="itemForm.unitPrice.$error.required" class="required-hint"></span>
-                    <span ng-show="itemForm.unitPrice.$error.number" class="form-error">Numbers only.</span>
+                    <span ng-show="itemForm.unitPrice.$error.big" class="form-error">Numbers only.</span>
                 </div>
                 <div class="item property-row">
                     <div class="property-label">Units:</div>
@@ -39,7 +39,11 @@
                 <div class="item property-row">
                     <div class="property-label">Image:</div>
                     <div class="property-value-text">
-                        <!-- TODO: File upload -->
+                        <div class="property-row">
+                            <!-- TODO: File upload -->
+                            <img class="catalog-item-img" ng-src="/img/items/{{editItem.image}}">
+                            <input type="file" name="image" accept="image/jpeg, image/png, image/gif">
+                        </div>
                     </div>
                 </div>
             </div>

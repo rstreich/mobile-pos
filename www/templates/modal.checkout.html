@@ -15,10 +15,10 @@
             <div class="checkout-box">
                 <div class="checkout-row">
                     <div class="checkout-col">
-                        <div class="checkout-total">Due: {{(cartTotal - checkoutData.amountTendered) | number:2}}</div>
+                        <div class="checkout-total">Due: {{moneyDue() | dollars:true}}</div>
                     </div>
                     <div class="checkout-col">
-                        <div class="checkout-total">Received&emsp;<input id="dollars" type="number" step="any" ng-model="checkoutData.amountTendered"></div>
+                        <div class="checkout-total">Received&emsp;<div dollar-input name="amount-tendered" ng-model="checkoutData.amountTendered"></div></div>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                         <button class="money-button" ng-click="addTendered(20)">+$20</button>
                     </div>
                 </div>
-                <button class="money-button" ng-click="setTendered(cartTotal)">Full Amount</button>
+                <button class="money-button" ng-click="setTendered(cartTotal)">Full Amount: {{cartTotal | dollars:true}}</button>
                 <button class="money-button" ng-click="clearTendered()">Reset</button>
             </div>
             <button class="button button-block button-positive" ng-show="steps[currentStep].next" ng-click="nextStep()">{{steps[currentStep].current.name}}</button>
@@ -43,23 +43,23 @@
             <div class="checkout-box">
                 <div class="checkout-row">
                     <div class="checkout-col">
-                        <div class="checkout-total">Change due: ${{changeDue() | number:2}}</div>
+                        <div class="checkout-total">Change due: {{changeDue() | dollars:true}}</div>
                     </div>
                     <div class="checkout-col">
-                        <div class="checkout-total">Change given:&emsp;<input id="dollars" type="number" step="any" ng-model="checkoutData.changeGiven"></div>
+                        <div class="checkout-total">Change given:&emsp;<div dollar-input name="change-given" ng-model="checkoutData.changeGiven"></div></div>
                     </div>
                 </div>
-                <button class="money-button" ng-click="setChangeGiven(changeDue())">All</button>
+                <button class="money-button" ng-click="setChangeGiven(changeDue())">All: {{changeDue() | dollars:true}}</button>
             </div>
             <button class="button button-block button-positive" ng-show="steps[currentStep].next" ng-click="nextStep()">{{steps[currentStep].current.name}}</button>
         </script>
 
         <script id="part.complete-sale.html" type="text/ng-template">
             <div class="list">
-                <div class="item checkout-total">Total in Cart: ${{cartTotal | number:2}}</div>
-                <div class="item checkout-total">Money Received: ${{checkoutData.amountTendered | number:2}}</div>
-                <div class="item checkout-total">Change Given: ${{checkoutData.changeGiven | number:2}}</div>
-                <div class="item checkout-total">Total Sale: ${{getTotalSale() | number:2}}</div>
+                <div class="item checkout-total">Total in Cart: {{cartTotal | dollars:true}}</div>
+                <div class="item checkout-total">Money Received: {{checkoutData.amountTendered | dollars:true}}</div>
+                <div class="item checkout-total">Change Given: {{checkoutData.changeGiven | dollars:true}}</div>
+                <div class="item checkout-total">Total Sale: {{getTotalSale() | dollars:true}}</div>
             </div>
             <button class="button button-block button-positive" ng-click="completeSale()">Complete Sale</button>
             <ion-spinner ng-show="stillSaving"></ion-spinner>

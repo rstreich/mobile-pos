@@ -111,9 +111,20 @@ angular.module('produce.controllers', [])
     $scope.uoms = uomService.list();
     $scope.items = itemService.list();
 
-    /*
-     * Edit item modal
-     */
+
+        $scope.big = { fooble: Big(100) };
+        $scope.whatAmI = function() {
+            console.log(typeof $scope.big.fooble);
+            console.log(angular.toJson($scope.big.fooble));
+        };
+
+        $scope.setBig = function() {
+            $scope.big.fooble = Big(234.98);
+        };
+
+        /*
+         * Edit item modal
+         */
 
     $scope.editItem = null;
 
@@ -280,35 +291,36 @@ angular.module('produce.controllers', [])
 
     $scope.cartData = { showDelete: false, summarySlide: false };
 
-    $scope.cartTotal = 0.00;
+    $scope.cartTotal = null;
 
     // Compute the subtotal for an item in the cart, then recompute the total.
     this.doSubtotal = function doSubtotal(cartItem) {
-        cartItem.subtotal = cartItem.item.unitPrice * cartItem.quantity;
+        cartItem.subtotal = cartItem.item.unitPrice.times(cartItem.quantity);
         self.doTotal();
     };
 
     // Total up all of the items in the cart.
     this.doTotal = function doTotal() {
-        var total = 0.00;
+        var total = Big(0);
         for (var i = 0; i < $scope.cart.length; ++i) {
-            total += $scope.cart[i].subtotal;
+            total = total.plus($scope.cart[i].subtotal);
         }
         $scope.cartTotal = total;
     };
 
     $scope.slideChanged = function slideChanged(index) {
-        $scope.cartData.summarySlide = index === 1;
+        $scope.cartData.summarySlide = (index === 1);
     };
 
     // Clear the cart
     $scope.emptyCart = function emptyCart() {
         cartService.emptyCart();
-        $scope.cartTotal = 0.00;
+        $scope.cartTotal = null;
     };
 
     $scope.removeFromCart = function removeFromCart(cartItem) {
         cartService.removeFromCart(cartItem);
+        self.doTotal();
     };
 
     // Increment the quantity of an item in the cart by 1, then recompute prices.
@@ -341,13 +353,13 @@ angular.module('produce.controllers', [])
     };
 
     $scope.confirmDelete = function confirmDelete(cartItem) {
-        var confirmPopup = $ionicPopup.confirm({
+        $ionicPopup.confirm({
             title: 'Delete from cart',
             template: 'Are you sure you want to delete ' + cartItem.item.name + ' from the cart?'
-        });
-        confirmPopup.then(function(res) {
+        })
+        .then(function(res) {
             if (res) {
-                cartService.removeFromCart(cartItem);
+                $scope.removeFromCart(cartItem);
             }
         });
     };
@@ -410,14 +422,14 @@ angular.module('produce.controllers', [])
     };
 
     $scope.getTotalSale = function getTotalSale() {
-        return $scope.checkoutData.amountTendered - $scope.checkoutData.changeGiven;
+        return $scope.checkoutData.amountTendered.minus($scope.checkoutData.changeGiven);
     };
 
     // TODO: Control this in the promise from the service.
     $scope.stillSaving = false;
     $scope.completeSale = function completeSale() {
         $scope.stillSaving = true;
-        cartService.save(authService.getUser(), authService.getCurrentLocation(), $scope.checkoutData.amountTendered - $scope.checkoutData.changeGiven);
+        cartService.save(authService.getUser(), authService.getCurrentLocation(), $scope.checkoutData.amountTendered.minus($scope.checkoutData.changeGiven));
         $timeout(function() {
             $scope.stillSaving = false;
             $timeout(function() {
@@ -435,13 +447,13 @@ angular.module('produce.controllers', [])
     // These are all properties that will be used by the modal. They are defined here so that the CheckoutController
     // can access them through its several states.
     $scope.checkoutData = {
-        amountTendered : 0,
-        changeGiven: 0
+        amountTendered: Big(0),
+        changeGiven: Big(0)
     };
 
     this.initCheckoutData = function() {
-        $scope.checkoutData.amountTendered = 0;
-        $scope.checkoutData.changeGiven = 0;
+        $scope.checkoutData.amountTendered = Big(0);
+        $scope.checkoutData.changeGiven = Big(0);
     };
 
     /*
@@ -479,7 +491,7 @@ angular.module('produce.controllers', [])
 
 .controller('CheckoutController', function($scope) {
     $scope.addTendered = function addTendered(amt) {
-        $scope.checkoutData.amountTendered += amt;
+        $scope.checkoutData.amountTendered = $scope.checkoutData.amountTendered.plus(amt);
     };
 
     $scope.setTendered = function setTendered(amt) {
@@ -487,12 +499,17 @@ angular.module('produce.controllers', [])
     };
 
     $scope.clearTendered = function clearTendered() {
-        $scope.checkoutData.amountTendered = 0.0;
+        $scope.checkoutData.amountTendered = Big(0);
     };
 
     $scope.changeDue = function changeDue() {
-        var due = $scope.checkoutData.amountTendered - $scope.cartTotal;
-        return (0 > due) ? 0 : due;
+        var due = $scope.checkoutData.amountTendered.minus($scope.cartTotal);
+        return (due.lt(0)) ? Big(0) : due;
+    };
+
+    $scope.moneyDue = function changeDue() {
+        var due = $scope.cartTotal.minus($scope.checkoutData.amountTendered);
+        return (due.lt(0)) ? Big(0) : due;
     };
 
     $scope.setChangeGiven = function setChangeGiven(amt) {

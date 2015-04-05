@@ -25,6 +25,15 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
     }
 })
 
+.filter('dollars', function() {
+    return function(input, addSymbol) {
+        if (!input || !(input instanceof Big)) {
+            return '0.00';
+        }
+        return (addSymbol ? '$' : '') + input.toFixed(2);
+    };
+})
+
 .directive("compareTo", function() {
     return {
         require: "ngModel",
@@ -41,6 +50,75 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
                     ngModel.$validate();
                 });
             }
+        }
+    };
+})
+
+.directive('dollarInput', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        scope: {
+            ngModel: '=',
+            positiveOnly: '@', // TODO:
+            name: '@',
+            required: '@'
+        },
+        link: function(scope, element, attrs, modelController) {
+            var validPattern = /^(\d*)(\.(\d{1,2})?)?$/;
+            var required = scope.hasOwnProperty('required');
+
+            modelController.$render = function() {
+                console.log("Render called: " + modelController.$viewValue);
+                element.html(modelController.$viewValue);
+            };
+
+            element.attr('contenteditable', true);
+
+            element.on('input', function() {
+                scope.$apply(function() {
+                    modelController.$setViewValue(element.html());
+                    console.log("Change applied.");
+                });
+            });
+
+            function bigFormatter(modelValue) {
+                if (!modelValue) {
+                    return modelValue;
+                }
+                if (!(modelValue instanceof Big)) {
+                    console.log("Formatter: Yeah, I set it: " + modelValue);
+                    console.log("Formatter: Model: " + typeof modelValue);
+                    modelController.$setValidity('big', false);
+                    return modelValue;
+                }
+                console.log("Formatter: Yeah, step 1: " + modelValue.toFixed(2));
+                modelController.$setValidity('big', true);
+                return modelValue.toFixed(2);
+            }
+
+            modelController.$formatters.push(bigFormatter);
+
+            function bigParser(domValue) {
+                console.log("Parser: I got called: " + domValue);
+                console.log("Parser: domValue: " + typeof domValue);
+                if (modelController.$isEmpty(domValue)) {
+                    if (required) {
+                        modelController.$setValidity('required', false);
+                    } else {
+                        modelController.$setValidity('required', true);
+                    }
+                    return new Big(0);
+                }
+                if (!validPattern.test(domValue)) {
+                    modelController.$setValidity('pattern', false);
+                    return undefined;
+                }
+                modelController.$setValidity('pattern', true);
+                return new Big(domValue);
+            }
+
+            modelController.$parsers.push(bigParser);
         }
     };
 })

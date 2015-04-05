@@ -10,7 +10,7 @@
             <div ng-repeat="item in items" class="catalog-item card" ng-click="addItemToCart(item)">
                 <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
                 <div class="catalog-item-text">{{item.name}}</div>
-                <div class="catalog-item-text">${{item.unitPrice | number:2}} {{item.uom.name}}</div>
+                <div class="catalog-item-text">{{item.unitPrice | dollars:true}} {{item.uom.name}}</div>
             </div>
         </div>
     </ion-content>

@@ -17,7 +17,7 @@
                         <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
                     </div>
                     <div class="admin-property-col">
-                        <div class="catalog-item-text"><b>Price:</b>&emsp;${{item.unitPrice | number:2}}</div>
+                        <div class="catalog-item-text"><b>Price:</b>&emsp;{{item.unitPrice | dollars:true}}</div>
                         <div class="catalog-item-text"><b>Units:</b>&emsp;{{item.uom.name}}</div>
                         <div ng-if="!item.isActive" style="color: red" class="catalog-item-text"><b>INACTIVE</b></div>
                     </div>
