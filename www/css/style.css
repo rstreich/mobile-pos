@@ -237,37 +237,48 @@ ion-popover-view.fit ion-content {
  * Edit forms
  */
 
-.property-row, .property-label, .property-value-text, .property-value-checkbox {
-    display: -webkit-flex;
-    display: flex;
+table.edit-table {
+    width: 100%;
+    border: 1px solid lightgray;
+}
+
+table.edit-table tr {
+    border-bottom: 1px solid lightgray;
+}
+
+table.edit-table tr.unruled {
+    border-bottom: none;
+}
+
+table.edit-table th, table.edit-table td {
+    vertical-align: middle;
+    padding: 5px;
     height: 4em;
 }
 
-.property-row {
+table.edit-table th {
+    text-align: left;
+}
+
+table.edit-table td {
+    padding: .5em;
+}
+
+.edit-item-img {
+    width: 100px;
+    height: auto;
+    max-height: 100px;
     flex-flow: row nowrap;
     -webkit-flex-flow: row nowrap;
 }
 
-.property-label {
-    flex-direction: column;
-    -webkit-flex-direction: column;
-    justify-content: flex-start;
-    -webkit-justify-content: flex-start;
-    align-items: flex-start;
-    -webkit-align-items: flex-start;
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 20%;
-    flex: 0 0 20%;
-    max-width: 20%;
+input[type=checkbox] {
+    height: 2em;
+    width: 2em;
 }
 
-.property-value-text, .property-value-checkbox {
-    flex-direction: column;
-    -webkit-flex-direction: column;
-    justify-content: flex-start;
-    -webkit-justify-content: flex-start;
-    align-items: center;
-    -webkit-align-items: center;
+select {
+    font-size: 1em;
 }
 
 /* TODO: Get these aligned better */
@@ -379,7 +390,7 @@ span.form-error {
     font-size: 1.25em;
     padding: .5em 1em .5em;
     color: white;
-    background-color: forestgreen;
+    background-color: cornflowerblue;
     border-radius: 1em;
     -webkit-border-radius: 1em;
 }
@@ -402,8 +413,8 @@ div[dollar-input] {
     user-select: text;
     border: solid 1px lightgray;
     border-radius: 4px;
-    margin: 5px 5px;
-    padding: 2px 5px;
+    /*margin: 5px 5px;*/
+    padding: 5px 5px;
     min-width: 5em;
     text-align: right;
 }

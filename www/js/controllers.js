@@ -104,6 +104,7 @@ angular.module('produce.controllers', [])
     };
 })
 
+// TODO: Make edit item a copy and then swap it back in--all edit controllers.
 /*
  * Controller for an admin-only section--items.
  */

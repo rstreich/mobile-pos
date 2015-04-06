@@ -1,5 +1,5 @@
 <ion-modal-view>
-    <ion-header-bar>
+    <ion-header-bar class="bar-positive">
         <h1 class="title">Add Item</h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeEditItem()">Cancel</button>
@@ -7,46 +7,48 @@
     </ion-header-bar>
     <ion-content class="padding">
         <form name="itemForm" class="css-form" novalidate>
-            <div class="list">
-                <div class="item property-row">
-                    <div class="property-label">Name:</div>
-                    <div class="property-value-text">
+            <table class="edit-table">
+                <tr>
+                    <th>Name:</th>
+                    <td>
                         <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="editItem.name">
-                    </div>
-                    <span ng-show="itemForm.name.$error.required" class="required-hint"></span>
-                </div>
-                <div class="item property-row">
-                    <div class="property-label">Unit Price:</div>
-                    <div class="property-value-text">
+                        <span ng-show="itemForm.name.$error.required" class="required-hint"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Unit Price:</th>
+                    <td>
                         <div dollar-input name="unitPrice" required ng-model="editItem.unitPrice"></div>
-                    </div>
-                    <span ng-show="itemForm.unitPrice.$error.required" class="required-hint"></span>
-                    <span ng-show="itemForm.unitPrice.$error.big" class="form-error">Numbers only.</span>
-                </div>
-                <div class="item property-row">
-                    <div class="property-label">Units:</div>
-                    <div class="property-value-text">
+                        <span ng-show="itemForm.unitPrice.$error.required" class="required-hint"></span>
+                        <span ng-show="itemForm.unitPrice.$error.pattern" class="form-error">Numbers only.</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Units:</th>
+                    <td>
                         <select name="uom" ng-options="uom.name for uom in uoms track by uom.id" required ng-model="editItem.uom"></select>
-                    </div>
-                    <span ng-show="itemForm.uom.$error.required" class="required-hint"></span>
-                </div>
-                <div class="item property-row">
-                    <div class="property-label">Is Active:</div>
-                    <div class="property-value-checkbox">
+                        <span ng-show="itemForm.uom.$error.required" class="required-hint"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Is Active:</th>
+                    <td>
                         <input type="checkbox" ng-model="editItem.isActive">
-                    </div>
-                </div>
-                <div class="item property-row">
-                    <div class="property-label">Image:</div>
-                    <div class="property-value-text">
-                        <div class="property-row">
-                            <!-- TODO: File upload -->
-                            <img class="catalog-item-img" ng-src="/img/items/{{editItem.image}}">
-                            <input type="file" name="image" accept="image/jpeg, image/png, image/gif">
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+                <tr class="unruled">
+                    <!-- TODO: File upload -->
+                    <th rowspan="2">Image:</th>
+                    <td>
+                        <img class="edit-item-img" ng-src="/img/items/{{editItem.image}}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="file" name="image" accept="image/jpeg, image/png, image/gif">
+                    </td>
+                </tr>
+            </table>
             <button ng-disabled="!(itemForm.$valid && itemForm.$dirty)" class="button button-block button-positive" ng-click="saveEditItem()" type="button">Save Changes</button>
         </form>
     </ion-content>

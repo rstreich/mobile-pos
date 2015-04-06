@@ -1,5 +1,5 @@
 <ion-modal-view>
-    <ion-header-bar>
+    <ion-header-bar class="bar-positive">
         <h1 class="title">Add Unit of Measure</h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeEditUom()">Cancel</button>
@@ -7,14 +7,14 @@
     </ion-header-bar>
     <ion-content class="padding">
         <form name="uomForm" class="css-form" novalidate>
-            <div class="list">
-                <div class="item property-row">
-                    <div class="property-label">Name:</div>
-                    <div class="property-value-text">
+            <table class="edit-table">
+                <tr>
+                    <th>Name:</th>
+                    <td>
                         <input id="edit-text" size="20" maxlength="20" type="text" required ng-model="editUom.name">
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            </table>
             <button ng-disabled="!(uomForm.$valid && uomForm.$dirty)" class="button button-block button-positive" ng-click="saveEditUom()" type="button">Save Changes</button>
         </form>
     </ion-content>

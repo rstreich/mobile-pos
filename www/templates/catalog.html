@@ -1,6 +1,6 @@
 <ion-view view-title="Catalog">
   <ion-content>
-      <div class="catalog-box">
+      <!--<div class="catalog-box">
           <form name="bigForm" novalidate>
               <div>Foo:</div>
               <div dollar-input name="dollars" required ng-model="big.fooble"></div>
@@ -13,13 +13,13 @@
 
       <button class="button button-positive" ng-click="whatAmI()">Click Me</button>
       <button class="button button-positive" ng-click="setBig()">Set Me</button>
-      <p>Model: {{big.fooble | dollars:true}}</p>
-      <!--<div class="catalog-box">
+      <p>Model: {{big.fooble | dollars:true}}</p>-->
+      <div class="catalog-box">
           <div ng-repeat="item in items" class="catalog-item card">
               <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">
               <div class="catalog-item-text">{{item.name}}</div>
-              <div class="catalog-item-text">{{item.unitPrice | dollar:true}} {{item.uom.name}}</div>
+              <div class="catalog-item-text">{{item.unitPrice | dollars:true}} {{item.uom.name}}</div>
           </div>
-      </div>-->
+      </div>
   </ion-content>
 </ion-view>

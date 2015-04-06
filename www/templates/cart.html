@@ -44,12 +44,12 @@
                 </ion-list>
             </ion-slide>
         </ion-slide-box>
-        <div class="button-bar" ng-show="cart.length">
+    </ion-content>
+    <ion-footer-bar class="bar-footer bar-stable">
+        <div class="buttons" ng-show="cart.length">
             <button class="button button-assertive" ng-click="emptyCart()">Empty Cart</button>
             <button class="button button-positive" ng-click="showCheckOut()">Check Out</button>
         </div>
-    </ion-content>
-    <ion-footer-bar class="bar-footer bar-stable">
-        <div class="col y-centering-box right-align-box" style="font-size: 1.8em">Total: {{cartTotal | dollars:true}}</div>
+        <div class="col y-centering-box right-align-box" style="font-size: 1.25em">Total: {{cartTotal | dollars:true}}</div>
     </ion-footer-bar>
 </ion-view>
