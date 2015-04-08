@@ -108,24 +108,13 @@ angular.module('produce.controllers', [])
 /*
  * Controller for an admin-only section--items.
  */
-.controller('ItemsController', function($scope, $ionicModal, itemService, uomService) {
+.controller('ItemsController', function($scope, $ionicModal, itemService, uomService, keypadService) {
     $scope.uoms = uomService.list();
     $scope.items = itemService.list();
 
-
-        $scope.big = { fooble: Big(100) };
-        $scope.whatAmI = function() {
-            console.log(typeof $scope.big.fooble);
-            console.log(angular.toJson($scope.big.fooble));
-        };
-
-        $scope.setBig = function() {
-            $scope.big.fooble = Big(234.98);
-        };
-
-        /*
-         * Edit item modal
-         */
+    /*
+     * Edit item modal
+     */
 
     $scope.editItem = null;
 
@@ -490,7 +479,9 @@ angular.module('produce.controllers', [])
     };
 })
 
-.controller('CheckoutController', function($scope) {
+.controller('CheckoutController', function($scope, keypadService) {
+    var self = this;
+
     $scope.addTendered = function addTendered(amt) {
         $scope.checkoutData.amountTendered = $scope.checkoutData.amountTendered.plus(amt);
     };
@@ -516,4 +507,25 @@ angular.module('produce.controllers', [])
     $scope.setChangeGiven = function setChangeGiven(amt) {
         $scope.checkoutData.changeGiven = amt;
     };
+
+    $scope.updateTenderedValue = function updateTenderedValue(result) {
+        if (result) {
+            $scope.checkoutData.amountTendered = Big(result);
+        }
+    };
+
+    $scope.updateChangeValue = function updateChangeValue(result) {
+        if (result) {
+            $scope.checkoutData.changeGiven = Big(result);
+        }
+    };
+
+    this.keypadModal = keypadService.getKeypadModal();
+    $scope.showKeypadModal = function showKeypadModal(updateValue) {
+        self.keypadModal.init($scope, updateValue)
+            .then(function(modal) {
+                modal.show();
+            });
+    };
+
 });

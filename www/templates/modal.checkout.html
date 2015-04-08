@@ -18,7 +18,7 @@
                         <div class="checkout-total">Due: {{moneyDue() | dollars:true}}</div>
                     </div>
                     <div class="checkout-col">
-                        <div class="checkout-total">Received:&nbsp;<div dollar-input name="amount-tendered" ng-model="checkoutData.amountTendered"></div></div>
+                        <div class="checkout-total">Received:&nbsp;<span class="keypad-input" ng-click="showKeypadModal(updateTenderedValue)">{{checkoutData.amountTendered | dollars:true}}</span></div>
                     </div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                         <div class="checkout-total">Change due: {{changeDue() | dollars:true}}</div>
                     </div>
                     <div class="checkout-col">
-                        <div class="checkout-total">Change given:&emsp;<div dollar-input name="change-given" ng-model="checkoutData.changeGiven"></div></div>
+                        <div class="checkout-total">Change given:&emsp;<span class="keypad-input" ng-click="showKeypadModal(updateChangeValue)">{{checkoutData.changeGiven | dollars:true}}</span></div>
                     </div>
                 </div>
                 <button class="money-button" ng-click="setChangeGiven(changeDue())">All: {{changeDue() | dollars:true}}</button>

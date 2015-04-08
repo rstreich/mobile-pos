@@ -106,7 +106,7 @@ angular.module('produce.services', [])
             var myScope = $scope.$new(false, $scope);
             myScope.locations = locService.list();
             myScope.data = {};
-            myScope.data.pickedLocation = { id: 23, name: 'Bumfuck, Egypt' };
+            myScope.data.pickedLocation = null;
 
             var promise = ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
                 scope: myScope
@@ -303,5 +303,84 @@ angular.module('produce.services', [])
 
     this.save = function save(user, location, totalCollected) {
     }
+})
+
+.service('keypadService', function($ionicModal) {
+
+    this.getKeypadModal = function getKeypadModal() {
+        var service = this;
+        var ionicModal = $ionicModal;
+
+        var init = function initPickLocationModal($scope, callback) {
+            var myScope = $scope.$new(false, $scope);
+
+            $scope.$on('modal.shown', resetData());
+
+            var promise = ionicModal.fromTemplateUrl('templates/modal.keypad.html', {
+                scope: myScope
+            }).then(function (modal) {
+                myScope.modal = modal;
+                return modal;
+            });
+
+            function resetData() {
+                myScope.data = { raw: '', display: '0'};
+            }
+
+            function updateDisplay() {
+                var raw = myScope.data.raw;
+                // Empty
+                if (!raw) {
+                    return myScope.data.display = '0';
+                }
+
+                // Get rid of any leading zeroes and update the model value
+                raw = raw.replace(/^0+/, '');
+                myScope.data.raw = raw;
+                if (!raw) { // Nothing left.
+                    return myScope.data.display = '0';
+                }
+
+                if (3 > raw.length) {
+                    if (1 === raw.length) {
+                        return myScope.data.display = '.0' + raw;
+                    }
+                    return myScope.data.display = '.' + raw;
+                }
+                myScope.data.display = [raw.slice(0, raw.length - 2), '.', raw.slice(-2)].join('');
+            }
+
+            myScope.add = function add(s) {
+                myScope.data.raw = myScope.data.raw + s;
+                updateDisplay();
+            };
+
+            myScope.del = function del() {
+                if (!myScope.data.raw) {
+                    return;
+                }
+                myScope.data.raw = myScope.data.raw.slice(0, -1);
+                updateDisplay();
+            };
+
+            myScope.closeModal = function closeModal(result) {
+                myScope.modal.hide();
+                if (callback) {
+                    callback(result);
+                }
+                resetData();
+            };
+
+            myScope.$on('$destroy', function() {
+                $scope.modal.remove();
+            });
+
+            return promise;
+        };
+
+        return {
+            init: init
+        };
+    };
 });
 

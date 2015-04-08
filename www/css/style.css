@@ -268,8 +268,6 @@ table.edit-table td {
     width: 100px;
     height: auto;
     max-height: 100px;
-    flex-flow: row nowrap;
-    -webkit-flex-flow: row nowrap;
 }
 
 input[type=checkbox] {
@@ -380,6 +378,17 @@ span.form-error {
     margin: 5px;
 }
 
+span.keypad-input {
+    display: inline-block;
+    cursor: pointer;
+    user-select: text;
+    border: solid 1px lightgray;
+    border-radius: 4px;
+    padding: 5px 5px;
+    min-width: 5em;
+    text-align: right;
+}
+
 .money-button {
     display: inline-block;
     outline: none;
@@ -395,9 +404,6 @@ span.form-error {
     -webkit-border-radius: 1em;
 }
 
-.money-button:hover {
-    text-decoration: none;
-}
 .money-button:active {
     position: relative;
     top: 1px;
@@ -409,7 +415,7 @@ span.form-error {
 
 div[dollar-input] {
     display: inline-block;
-    -webkit-user-select: text;  /* IOS hack */
+    -webkit-user-select: text;   /* IOS hack */
     user-select: text;
     border: solid 1px lightgray;
     border-radius: 4px;
@@ -423,14 +429,7 @@ div[dollar-input]:before {
     content: "$";
 }
 
-input#dollars {
-    height: 2.25em;
-    font-size: 1em;
-    text-align: right;
-    width: 8em;
-}
-
-input#edit-text, input#dollars {
+input#edit-text {
     padding: 6px 12px;
     color: #555555;
     vertical-align: middle;
@@ -459,4 +458,72 @@ input#edit-text {
 
 input#edit-text.ng-invalid.ng-dirty, div[dollar-input].ng-invalid.ng-dirty {
     background-color: #FA787E;
+}
+
+/*
+ * Keypad
+ */
+.keypad-box {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: center;
+    -webkit-justify-content: center;
+}
+
+.keypad-button {
+    display: inline-block;
+    outline: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    margin: 15px;
+    font-size: 1.5em;
+    padding: .5em 1em .5em;
+    color: white;
+    background-color: cornflowerblue;
+    border-radius: 1em;
+    -webkit-border-radius: 1em;
+}
+
+.keypad-button:active {
+    position: relative;
+    top: 1px;
+}
+
+table.keypad {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    display: block;
+    margin: auto;
+    border: 1px solid lightgray;
+}
+
+table.keypad td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+table.keypad td.keypad-delete {
+    font-size: 3em;
+    text-align: right;
+}
+
+table.keypad td.keypad-total {
+    text-align: right;
+    vertical-align: middle;
+}
+
+div.keypad-total {
+    font-size: 2em;
+    width: 100%;
+    line-height: 1em;
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid lightgray;
+    border-radius: .25em;
+    -webkit-border-radius: .25em;
 }
