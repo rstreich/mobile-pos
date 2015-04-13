@@ -1,5 +1,5 @@
 var uomModel = require('../models/uom');
-var protocol = require('../lib/protocol');
+var protocol = require('../www/js/protocol');
 
 //PROTECTED: Admin only
 exports.get = function getUnitOfMeasure(req, res) {
@@ -47,7 +47,9 @@ exports.insert = function insertUnitOfMeasure(req, res) {
         if (err) {
             return protocol.writeError(500, req, res, err);
         }
-        return protocol.writeMessage(201, req, res, 'Unit of measure ' + uom.name + ' added. ID: ' + results.insertId, true);
+        var newUrl = req.originalUrl + '/' + results.insertId;
+        uom.id = results.insertId;
+        return protocol.writeCreated(req, res, uom, newUrl);
     });
 };
 
@@ -64,11 +66,10 @@ exports.update = function updateUnitOfMeasure(req, res) {
     // Validate input.
     if (!uom) {
         return protocol.writeError(400, req, res, 'No unit of measure provided.');
-    } else if (uom.id && uom.id !== id) {
+    } else if (uom.id !== id) {
         return protocol.writeError(400, req, res, 'Unit of measure ID in JSON(' + uom.id + ') does not match specified ID: ' + id);
     }
     
-    uom.id = id;
     return uomModel.update(uom, function updateUnitOfMeasureCallback(err, results) {
         if (err) {
             return protocol.writeError(500, req, res, err);

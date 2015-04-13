@@ -254,10 +254,10 @@ table.edit-table th, table.edit-table td {
     vertical-align: middle;
     padding: 5px;
     height: 4em;
+    text-align: left;
 }
 
 table.edit-table th {
-    text-align: left;
 }
 
 table.edit-table td {
@@ -409,6 +409,21 @@ span.keypad-input {
     top: 1px;
 }
 
+.sale-complete-box {
+    display: flex;
+    display: -webkit-flex;
+    flex-flow: column;
+    -webkit-flex-flow: column;
+    justify-content: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    -webkit-align-items: center;
+    height: 200px;
+}
+
+.sale-spinner {
+    display: block;
+}
 /*
  * Input styles
  */
@@ -450,10 +465,11 @@ input#edit-text:focus, div[dollar-input]:focus {
 }
 
 input#edit-text {
+    display: inline-block;
     font-size: 14px;
     height: 34px;
     line-height: 1.428571429;
-    width: 100%;
+    /*width: 100%;*/
 }
 
 input#edit-text.ng-invalid.ng-dirty, div[dollar-input].ng-invalid.ng-dirty {

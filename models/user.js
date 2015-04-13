@@ -29,11 +29,13 @@ var fields = allProps.slice(0, allProps.length - 1).join();
  */
 var tableName = 'Users';
 
+var orderBy = ' ORDER BY name';
+
 var existsQuery = factory.makeSimpleGet('SELECT name from ' + tableName + ' FORCE INDEX WHERE ? LIMIT 1');
 var getQuery = factory.makeSimpleGet('SELECT ' + fields + ' from ' + tableName + ' WHERE ?');
 var getPasswordQuery = factory.makeSimpleGet('SELECT ' + allFields + ' from ' + tableName + ' where ? AND isActive > 0');
-var getAllQuery = factory.makeSimpleGetAll('SELECT ' + fields + ' from ' + tableName);
-var getAllActiveQuery = factory.makeSimpleGetAll('SELECT ' + fields + ' from ' + tableName + ' WHERE isActive > 0');
+var getAllQuery = factory.makeSimpleGetAll('SELECT ' + fields + ' from ' + tableName + orderBy);
+var getAllActiveQuery = factory.makeSimpleGetAll('SELECT ' + fields + ' from ' + tableName + ' WHERE isActive > 0' + orderBy);
 var insertQuery = factory.makeSimpleInsert('INSERT INTO ' + tableName + ' SET ?');
 var updateQuery = factory.makeSimpleUpdate('UPDATE ' + tableName + ' SET ? WHERE ?');
 
@@ -57,7 +59,6 @@ exports.insert = function insert(user, callback) {
 };
 
 exports.update = function update(user, callback) {
-    // TODO: Delete ID?
     return updateQuery({ id: user.id }, user, callback);
 };
 

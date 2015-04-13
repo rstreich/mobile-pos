@@ -8,7 +8,7 @@
     <ion-content class="padding">
         <form name="pickLocationForm" class="css-form" novalidate>
             <select ng-options="location.name for location in locations track by location.id" required ng-model="data.pickedLocation"></select>
-            <button ng-disabled="pickLocationForm.$invalid" class="button button-block button-positive" ng-click="closeModal(true)" type="button">Select Location</button>
+            <button ng-disabled="pickLocationForm.$invalid" class="button button-block button-positive" ng-click="closeModal(true)">Select Location</button>
         </form>
     </ion-content>
 </ion-modal-view>

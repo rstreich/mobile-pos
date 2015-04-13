@@ -8,7 +8,7 @@
        <ion-slide-box on-slide-changed="slideChanged($index)">
             <ion-slide class="padding">
                 <div class="catalog-box">
-                    <div class="cart-box card" ng-repeat="cartItem in cart">
+                    <div class="cart-box card" ng-repeat="cartItem in cartData.cart">
                         <div class="catalog-item" on-hold="confirmDelete(cartItem)">
                             <img class="catalog-item-img" ng-src="/img/items/{{cartItem.item.image}}">
                             <div class="catalog-item-text">{{cartItem.item.name}}</div>
@@ -36,7 +36,7 @@
             </ion-slide>
             <ion-slide class="padding">
                 <ion-list show-delete="cartData.showDelete">
-                    <ion-item class="row" ng-repeat="cartItem in cart">
+                    <ion-item class="row" ng-repeat="cartItem in cartData.cart">
                         <div class="col y-centering-box">{{cartItem.quantity}} {{cartItem.item.uom.name}} {{cartItem.item.name}}</div>
                         <div class="col-20 y-centering-box right-align-box">{{cartItem.subtotal | dollars:true}}</div>
                         <ion-delete-button class="ion-minus-circled" ng-click="removeFromCart(cartItem)">
@@ -46,10 +46,10 @@
         </ion-slide-box>
     </ion-content>
     <ion-footer-bar class="bar-footer bar-stable">
-        <div class="buttons" ng-show="cart.length">
-            <button class="button button-assertive" ng-click="emptyCart()">Empty Cart</button>
-            <button class="button button-positive" ng-click="showCheckOut()">Check Out</button>
+        <div class="buttons" ng-show="cartData.cart.length">
+            <button class="button button-assertive" ng-disabled="!cartData.cart.length" ng-click="emptyCart()">Empty Cart</button>
+            <button class="button button-positive" ng-disabled="cartData.cantCheckout" ng-click="showCheckOut()">Check Out</button>
         </div>
-        <div class="col y-centering-box right-align-box" style="font-size: 1.25em">Total: {{cartTotal | dollars:true}}</div>
+        <div class="col y-centering-box right-align-box" style="font-size: 1.25em">Total: {{cartData.cartTotal | dollars:true}}</div>
     </ion-footer-bar>
 </ion-view>

@@ -1,21 +1,25 @@
 <ion-modal-view>
     <ion-header-bar class="bar-positive">
-        <h1 class="title">Add Location</h1>
+        <h1 class="title">
+            <span ng-show="formData.add">Add</span><span ng-hide="formData.add">Edit</span> Location
+        </h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeEditLocation()">Cancel</button>
         </div>
     </ion-header-bar>
     <ion-content class="padding">
-        <form name="locationForm" class="css-form" novalidate>
-            <table class="edit-table">
+        <form name="locationForm" ng-controller="FormHackController" class="css-form" ng-submit="saveEditLocation()" novalidate>
+            <table class="edit-table" ng-init="setForm(locationForm)">
                 <tr>
                     <th>Name:</th>
                     <td>
-                        <input id="edit-text" size="40" maxlength="40" type="text" required ng-model="editLocation.name">
+                        <input id="edit-text" size="40" maxlength="40" type="text" required ng-model="formData.editLocation.name">
                     </td>
                 </tr>
             </table>
-            <button ng-disabled="!(locationForm.$valid && locationForm.$dirty)" class="button button-block button-positive" ng-click="saveEditLocation()" type="button">Save Changes</button>
+            <button class="button button-block button-positive" type="submit" ng-disabled="!(locationForm.$valid && locationForm.$dirty)">
+                <span ng-show="formData.add">Submit Location</span><span ng-hide="formData.add">Save Changes</span>
+            </button>
         </form>
     </ion-content>
 </ion-modal-view>

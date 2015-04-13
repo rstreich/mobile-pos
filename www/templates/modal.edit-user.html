@@ -1,45 +1,47 @@
 <ion-modal-view>
     <ion-header-bar class="bar-positive">
-        <h1 class="title">Add Item</h1>
+        <h1 class="title">
+            <span ng-show="formData.add">Add</span><span ng-hide="formData.add">Edit</span> User
+        </h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeEditUser()">Cancel</button>
         </div>
     </ion-header-bar>
     <ion-content class="padding">
-        <form name="userForm" class="css-form" novalidate>
-            <table class="edit-table">
+        <form name="userForm" ng-controller="FormHackController" ng-submit="saveEditUser()" class="css-form" novalidate>
+            <table class="edit-table" ng-init="setForm(userForm)">
                 <tr>
                     <th>Name:</th>
                     <td colspan="3">
-                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="editUser.name">
-                        <span ng-show="userForm.name.$error.required" class="required-hint"></span>
+                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="formData.editUser.name">
+                        <span class="required-hint" ng-show="userForm.name.$error.required"></span>
                     </td>
                 </tr>
                 <tr>
                     <th>Password: </th>
-                    <td>
-                        <input name="password" id="edit-text" ng-model-options="{ debounce: 750 }" size="20" minlength="8" type="text" ng-required="pwdRequired" ng-model="editUser.pwd">
-                    </td>
-                    <td  colspan="2">
-                        <span class="edit-info" ng-show="!(pwdRequired || userForm.password.$dirty)"> (Current password not shown)</span>
-                        <span ng-show="userForm.password.$error.required" class="required-hint"></span>
-                        <span ng-show="userForm.password.$error.minlength" class="form-error">Password must be at least eight characters.</span>
+                    <td colspan="3">
+                        <input name="password" id="edit-text" ng-model-options="{ debounce: 750 }" size="20" minlength="8" type="text" ng-required="formData.pwdRequired" ng-model="formData.editUser.pwd">
+                        <span class="edit-info" ng-show="!(formData.pwdRequired || userForm.password.$dirty)"> (Current password not shown)</span>
+                        <span class="required-hint" ng-show="userForm.password.$error.required"></span>
+                        <span class="form-error" ng-show="userForm.password.$error.minlength">Password must be at least eight characters.</span>
                     </td>
                 </tr>
                 <tr>
                     <th>Is Active:</th>
                     <td colspan="3">
-                        <input type="checkbox" ng-model="editUser.isActive">
+                        <input type="checkbox" ng-model="formData.editUser.isActive">
                     </td>
                 </tr>
                 <tr>
                     <th>Is Admin:</th>
                     <td colspan="3">
-                        <input type="checkbox" ng-model="editUser.isAdmin">
+                        <input type="checkbox" ng-model="formData.editUser.isAdmin">
                     </td>
                 </tr>
             </table>
-            <button ng-disabled="!(userForm.$valid && userForm.$dirty)" class="button button-block button-positive" ng-click="saveEditUser()" type="button">Save Changes</button>
+            <button class="button button-block button-positive" type="submit" ng-disabled="!(userForm.$valid && userForm.$dirty)">
+                <span ng-show="formData.add">Submit User</span><span ng-hide="formData.add">Save Changes</span>
+            </button>
         </form>
     </ion-content>
 </ion-modal-view>

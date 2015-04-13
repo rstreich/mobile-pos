@@ -3,13 +3,15 @@
  */
 
 var factory = require('../lib/queryFactory');
+var async = require('async');
+var Big = require('big.js');
 
 //TODO: MAYBE--Add optimistic locking.
 /* jshint laxbreak:true */
 var baseSelect = 'SELECT Sales.id AS saleId,'
     +  ' Sales.saleDate AS saleDate,'
     +  ' Users.name AS soldBy,'
-    +  ' Sales.totalPrice as total,'
+    +  ' Sales.totalCollected as total,'
     +  ' Items.name AS item,'
     +  ' SoldItems.quantity AS quantity,'
     +  ' SoldItems.unitPrice AS unitPrice,'
@@ -29,9 +31,9 @@ var baseSelect = 'SELECT Sales.id AS saleId,'
 var selectById = baseSelect + ' WHERE ?';
 
 var soldItemPropsIn = ['quantity', 'unitPrice', 'item'];
-var soldItemPropsOut = ['quantity', 'unitPrice', 'item', 'sale'];
+var soldItemPropsOut = soldItemPropsIn.concat('sale');
 
-var saleProps = ['location', 'totalPrice', 'soldBy'];
+var saleProps = ['location', 'totalCollected', 'soldBy'];
 
 var saleInsertSql = 'INSERT INTO Sales SET ?';
 var soldItemsInsertSql = 'INSERT INTO SoldItems(??) VALUES ?';
@@ -45,7 +47,7 @@ exports.get = function getSale(saleId, callback) {
         } else if (!result) {
             callback(null, null);
         } else {
-            var sale = { id: result[0].saleId, saleDate: result[0].saleDate, soldBy: result[0].soldBy, totalPrice: result[0].total};
+            var sale = { id: result[0].saleId, saleDate: result[0].saleDate, soldBy: result[0].soldBy, totalCollected: result[0].total};
             var soldItems = [];
             for (var i = 0; i < result.length; ++i) {
                 soldItems.push({ item: result[i].item, quantity: result[i].quantity, unitPrice: result[i].unitPrice, uom: result[i].uom });
@@ -57,67 +59,102 @@ exports.get = function getSale(saleId, callback) {
 };
 
 exports.insert = function insert(sale, callback) {
-    var discreetSale = { location: sale.location, totalPrice: sale.totalPrice, soldBy: sale.soldBy };
+    var discreteSale = { location: sale.location, totalCollected: sale.totalCollected, soldBy: sale.soldBy };
 
     factory.pool.getConnection(function(err, c) {
         if (err) {
-            callback(err);
-        } else {
-            try {
-                c.beginTransaction(function(err) {
-                    if (err) {
-                        throw err;
-                    }
-                    c.query(saleInsertSql, discreetSale, function writeSaleCallback(err, result) {
-                        if (err) {
-                            c.rollback(function() {
-                                throw err;
-                            });
-                        }
-                        // Result can be undefined if the insert call was malformed.
-                        if (!result) {
-                            c.rollback(function() {
-                                throw err;
-                            });
-                        }
-                        var saleId = result.insertId;
-                        for (var i = 0; i < sale.soldItems.length; ++i) {
-                            sale.soldItems[i].sale = saleId;
-                        }
-                        c.query(soldItemsInsertSql, [soldItemPropsOut, sale.soldItems], function writeSoldItemsCallback(err, result) {
-                            if (err) {
-                                c.rollback(function() {
-                                    throw err;
-                                });
-                            }
-                            c.commit(function(err) {
-                                if (err) {
-                                    c.rollback(function() {
-                                        throw err;
-                                    });
-                                }
-                                callback(null, saleId);
-                            });
-                        });
-                    });
-                });
-            } catch (err) {
-                callback(err);
-            }
+            return callback(err);
         }
+        return async.waterfall([
+            function beginTransaction(asyncCallback) {
+                c.beginTransaction(function beginTransactionCallback(err) {
+                    if (err) {
+                        return asyncCallback(err);
+                    }
+                    return asyncCallback(null);
+                })
+            },
+            function writeSale(asyncCallback) {
+                c.query(saleInsertSql, discreteSale, function writeSaleCallback(err, result) {
+                    if (err) {
+                        return asyncCallback(err);
+                    }
+                    // Result can be undefined if the insert call was malformed.
+                    if (!result) {
+                        return asyncCallback(new Error("Insert failed."));
+                    }
+                    return asyncCallback(null, result.insertId);
+                })
+            },
+            function writeSoldItems(saleId, asyncCallback) {
+                var soldItemVals = [];
+                for (var i = 0; i < sale.soldItems.length; ++i) {
+                    var soldItemVal = [];
+                    for (var j = 0; j < soldItemPropsIn.length; ++j) {
+                        soldItemVal.push(sale.soldItems[i][soldItemPropsIn[j]]);
+                    }
+                    soldItemVal.push(saleId);
+                    soldItemVals.push(soldItemVal);
+                }
+                c.query(soldItemsInsertSql, [soldItemPropsOut, soldItemVals], function writeSoldItemsCallback(err, result) {
+                    if (err) {
+                        return asyncCallback(err);
+                    }
+                    return asyncCallback(null, saleId);
+                });
+            }
+        ],
+        function mainCallback(err, saleId) {
+            if (err) {
+                return c.rollback(function() {
+                    callback(err);
+                });
+            } else {
+                c.commit(function(err) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    discreteSale.id = saleId;
+                    return callback(null, discreteSale);
+                });
+            }
+        });
     });
 };
 
-var createDiscreetSale = factory.createCleanObjectFunction(saleProps);
-var createDiscreetSoldItem = factory.createCleanObjectFunction(soldItemPropsIn);
+function createDiscreteSale(inboundSale) {
+    var sale = {};
+    if (inboundSale.location) {
+        sale.location = inboundSale.location.id || null;
+    }
+    if (inboundSale.soldBy) {
+        sale.soldBy = inboundSale.soldBy.id || null;
+    }
+    if (!Number.isNaN(inboundSale.totalCollected)){
+        sale.totalCollected = new Big(inboundSale.totalCollected);
+    }
+    return sale;
+}
+
+function createDiscreteSoldItem(inboundSoldItem) {
+    var soldItem = {};
+    soldItem.quantity = inboundSoldItem.quantity || null;
+    if (inboundSoldItem.item) {
+        soldItem.item = inboundSoldItem.item.id || null;
+        if (!Number.isNaN(inboundSoldItem.item.unitPrice)) {
+            soldItem.unitPrice = new Big(inboundSoldItem.item.unitPrice);
+        }
+    }
+    return soldItem;
+}
 
 exports.createSale = function createCleanSale(inboundSale) {
-    var sale = createDiscreetSale(inboundSale);
+    var sale = createDiscreteSale(inboundSale);
     var inboundSoldItems = inboundSale.soldItems;
     if (Array.isArray(inboundSoldItems)) {
         sale.soldItems = [];
         for (var i = 0; i < inboundSoldItems.length; ++i) {
-            sale.soldItems.push(createDiscreetSoldItem(inboundSoldItems[i]));
+            sale.soldItems.push(createDiscreteSoldItem(inboundSoldItems[i]));
         }
     }
     return sale;

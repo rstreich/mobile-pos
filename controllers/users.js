@@ -1,8 +1,8 @@
 var bcrypt = require('bcrypt');
 var userModel = require('../models/user');
-var protocol = require('../lib/protocol');
+var protocol = require('../www/js/protocol');
 
-//Consolidating hashing code
+// Consolidating hashing code
 function hashPassword(user, dbQuery, callback) {
     bcrypt.hash(user.pwd, 8, function hashCallback(err, hash) {
         if (err) {
@@ -75,7 +75,10 @@ exports.insert = function insertUser(req, res) {
         if (err) {
             return protocol.writeError(500, req, res, err);
         }
-        return protocol.writeMessage(201, req, res, 'User ' + user.name + ' added. ID: ' + results.insertId, true);
+        var newUrl = req.originalUrl + '/' + results.insertId;
+        user.id = results.insertId;
+        delete user.pwd;
+        return protocol.writeCreated(req, res, user, newUrl);
     });
 };
 
@@ -91,11 +94,10 @@ exports.update = function updateUser(req, res) {
     // Validate input.
     if (!user) {
         return protocol.writeError(400, req, res, 'No user provided.');
-    } else if (user.id && user.id !== id) {
+    } else if (user.id !== id) {
         return protocol.writeError(400, req, res, 'User ID in JSON(' + user.id + ') does not match specified ID: ' + id);
     }
-    user.id = id;
-    
+
     var successMessage = 'User ' + id + ' updated.';
     var failureMessage = 'Failed to update user: ' + id;
     if (user.pwd) {

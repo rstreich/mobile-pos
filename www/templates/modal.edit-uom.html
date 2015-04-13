@@ -1,21 +1,25 @@
 <ion-modal-view>
     <ion-header-bar class="bar-positive">
-        <h1 class="title">Add Unit of Measure</h1>
+        <h1 class="title">
+            <span ng-show="formData.add">Add</span><span ng-hide="formData.add">Edit</span> Unit of Measure
+        </h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeEditUom()">Cancel</button>
         </div>
     </ion-header-bar>
     <ion-content class="padding">
-        <form name="uomForm" class="css-form" novalidate>
-            <table class="edit-table">
+        <form name="uomForm" ng-controller="FormHackController" class="css-form" ng-submit="saveEditUom()" novalidate>
+            <table class="edit-table" ng-init="setForm(uomForm)">
                 <tr>
                     <th>Name:</th>
                     <td>
-                        <input id="edit-text" size="20" maxlength="20" type="text" required ng-model="editUom.name">
+                        <input id="edit-text" size="20" maxlength="20" type="text" required ng-model="formData.editUom.name">
                     </td>
                 </tr>
             </table>
-            <button ng-disabled="!(uomForm.$valid && uomForm.$dirty)" class="button button-block button-positive" ng-click="saveEditUom()" type="button">Save Changes</button>
+            <button class="button button-block button-positive" type="submit" ng-disabled="!(uomForm.$valid && uomForm.$dirty)">
+                <span ng-show="formData.add">Submit Unit</span><span ng-hide="formData.add">Save Changes</span>
+            </button>
         </form>
     </ion-content>
 </ion-modal-view>

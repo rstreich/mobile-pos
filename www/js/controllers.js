@@ -1,5 +1,7 @@
 angular.module('produce.controllers', [])
 // TODO: Ensure all vars that appear in models are prefixed with "data."
+// TODO: Update updates on success.
+// TODO: Edit modals need forms set to clean on view open
 /*
  * Controller for the login page.
  */
@@ -104,7 +106,15 @@ angular.module('produce.controllers', [])
     };
 })
 
-// TODO: Make edit item a copy and then swap it back in--all edit controllers.
+.controller('FormHackController', function($scope, itemService) {
+    $scope.setForm = function setForm(form) {
+        if (!$scope.formData) {
+            return console.log('Add $scope.formData, Dummy!');
+        }
+        return $scope.formData.form = form;
+    };
+})
+
 /*
  * Controller for an admin-only section--items.
  */
@@ -116,32 +126,41 @@ angular.module('produce.controllers', [])
      * Edit item modal
      */
 
-    $scope.editItem = null;
+    $scope.formData = {};
 
     $ionicModal.fromTemplateUrl('templates/modal.edit-item.html', {
         scope: $scope
-    }).then(function initEditItemModal(modal) {
-        $scope.addItemModal = modal;
+    }).then(function setItemModal(modal) {
+        $scope.editItemModal = modal;
     });
 
     $scope.closeEditItem = function closeEditItem() {
-        $scope.addItemModal.hide();
+        $scope.editItemModal.hide();
+        $scope.formData.form.$setPristine();
     };
 
     $scope.showEditItem = function showEditItem(item) {
-        if (!item) {
-            // "Add" path -- Initialize with some default settings.
-            $scope.editItem = { id: null, name: '', isActive: true, unitPrice: null, image: 'no-image.png', uom: null };
-        } else {
-            $scope.editItem = item;
-        }
-        $scope.addItemModal.show();
+        $scope.formData.add = !item;
+        $scope.formData.origItem = item || itemService.newItem({ id: null, name: '', isActive: true, unitPrice: null, image: 'no-image.png', uom: null });
+        $scope.formData.editItem = angular.extend({}, $scope.formData.origItem);
+        $scope.editItemModal.show();
     };
 
-    // TODO: Will a change to a property get propagated?
+    function itemNameCompare(left, right) {
+        return left.name.localeCompare(right.name);
+    }
+
+    function insertCallback(insertedItem) {
+        $scope.items.push(insertedItem);
+        $scope.items.sort(itemNameCompare);
+    }
+
+    function updateCallback(insertedItem) {
+        $scope.items.sort(itemNameCompare);
+    }
+
     $scope.saveEditItem = function saveEditItem() {
-        itemService.save($scope.editItem);
-        $scope.editItem = null;
+        itemService.save($scope.formData.editItem, $scope.formData.origItem, ($scope.formData.editItem.id ? updateCallback : insertCallback));
         $scope.closeEditItem();
     };
 })
@@ -156,7 +175,7 @@ angular.module('produce.controllers', [])
      * Edit user modal
      */
 
-    $scope.editUser = null;
+    $scope.formData = {};
 
     $ionicModal.fromTemplateUrl('templates/modal.edit-user.html', {
         scope: $scope
@@ -166,24 +185,32 @@ angular.module('produce.controllers', [])
 
     $scope.closeEditUser = function closeEditUser() {
         $scope.editUserModal.hide();
+        $scope.formData.form.$setPristine();
     };
 
     $scope.showEditUser = function showEditUser(user) {
-        if (!user) {
-            // "Add" path -- Initialize with some defaults.
-            $scope.editUser = { id: null, name: '', pwd: '', isActive: true, isAdmin: false };
-            $scope.pwdRequired = true;
-        } else {
-            $scope.editUser = user;
-            $scope.pwdRequired = false;
-        }
+        $scope.formData.add = !user;
+        $scope.formData.pwdRequired = !user;
+        $scope.formData.origUser = user || userService.newUser({ id: null, name: '', pwd: '', isActive: true, isAdmin: false });
+        $scope.formData.editUser = angular.extend({}, $scope.formData.origUser);
         $scope.editUserModal.show();
     };
 
-    // TODO: Will a change to a property get propagated?
+    function userNameCompare(left, right) {
+        return left.name.localeCompare(right.name);
+    }
+
+    function insertCallback(insertedUser) {
+        $scope.users.push(insertedUser);
+        $scope.users.sort(userNameCompare);
+    }
+
+    function updateCallback(insertedUser) {
+        $scope.users.sort(userNameCompare);
+    }
+
     $scope.saveEditUser = function saveEditUser() {
-        userService.save($scope.editUser);
-        $scope.editUser = null;
+        userService.save($scope.formData.editUser, $scope.formData.origUser, ($scope.formData.editUser.id ? updateCallback : insertCallback));
         $scope.closeEditUser();
     };
 })
@@ -197,33 +224,41 @@ angular.module('produce.controllers', [])
     /*
      * Edit location modal
      */
-
-    $scope.editLocation = null;
+    $scope.formData = {};
 
     $ionicModal.fromTemplateUrl('templates/modal.edit-location.html', {
         scope: $scope
-    }).then(function initEditLocationModal(modal) {
+    }).then(function setLocationModal(modal) {
         $scope.editLocationModal = modal;
     });
 
     $scope.closeEditLocation = function closeEditLocation() {
         $scope.editLocationModal.hide();
+        $scope.formData.form.$setPristine();
     };
 
     $scope.showEditLocation = function showEditLocation(location) {
-        if (!location) {
-            // "Add" path
-            $scope.editLocation = { id: null, name: '' };
-        } else {
-            $scope.editLocation = location;
-        }
+        $scope.formData.add = !location;
+        $scope.formData.origLocation = location || locationService.newLocation({ id: null, name: '' });
+        $scope.formData.editLocation = angular.extend({}, $scope.formData.origLocation);
         $scope.editLocationModal.show();
     };
 
-    // TODO: Will a change to a property get propagated?
+    function locationNameCompare(left, right) {
+        return left.name.localeCompare(right.name);
+    }
+
+    function insertCallback(insertedLocation) {
+        $scope.locations.push(insertedLocation);
+        $scope.locations.sort(locationNameCompare);
+    }
+
+    function updateCallback(insertedLocation) {
+        $scope.locations.sort(locationNameCompare);
+    }
+
     $scope.saveEditLocation = function saveEditLocation() {
-        locationService.save($scope.editLocation);
-        $scope.editLocation = null;
+        locationService.save($scope.formData.editLocation, $scope.formData.origLocation, ($scope.formData.editLocation.id ? updateCallback : insertCallback));
         $scope.closeEditLocation();
     };
 })
@@ -237,33 +272,41 @@ angular.module('produce.controllers', [])
     /*
      * Edit uom modal
      */
-
-    $scope.editUom = null;
+    $scope.formData = {};
 
     $ionicModal.fromTemplateUrl('templates/modal.edit-uom.html', {
         scope: $scope
-    }).then(function initEditUomModal(modal) {
+    }).then(function setUomModal(modal) {
         $scope.editUomModal = modal;
     });
 
     $scope.closeEditUom = function closeEditUom() {
         $scope.editUomModal.hide();
+        $scope.formData.form.$setPristine();
     };
 
     $scope.showEditUom = function showEditUom(uom) {
-        if (!uom) {
-            // "Add" path
-            $scope.editUom = { id: null, name: '' };
-        } else {
-            $scope.editUom = uom;
-        }
+        $scope.formData.add = !uom;
+        $scope.formData.origUom = uom || uomService.newUom({ id: null, name: '' });
+        $scope.formData.editUom = angular.extend({}, $scope.formData.origUom);
         $scope.editUomModal.show();
     };
 
-    // TODO: Will a change to a property get propagated?
+    function uomNameCompare(left, right) {
+        return left.name.localeCompare(right.name);
+    }
+
+    function insertCallback(insertedUom) {
+        $scope.uoms.push(insertedUom);
+        $scope.uoms.sort(uomNameCompare);
+    }
+
+    function updateCallback(insertedUom) {
+        $scope.uoms.sort(uomNameCompare);
+    }
+
     $scope.saveEditUom = function saveEditUom() {
-        uomService.save($scope.editUom);
-        $scope.editUom = null;
+        uomService.save($scope.formData.editUom, $scope.formData.origUom, ($scope.formData.editUom.id ? updateCallback : insertCallback));
         $scope.closeEditUom();
     };
 })
@@ -272,32 +315,46 @@ angular.module('produce.controllers', [])
  * The biggest chunk--managing the shopping cart--all client side. Nothing sent to server until sale is completed.
  * Not intended to be a persistent shopping cart.
  */
-    // TODO: Get rid of $timeout when through playing.
-.controller('CartController', function($scope, $state, $ionicModal, $ionicPopup, $timeout, itemService, cartService, authService) {
+// TODO: Move cart totalling, etc. into cartService. Consider richer Cart and CartItem objects.
+.controller('CartController', function($scope, $state, $ionicModal, $ionicPopup, itemService, cartService, authService) {
     var self = this;
 
+    // Used to selecta new item for the cart.
     $scope.items = itemService.list();
-    $scope.cart = cartService.getCurrentCart();
 
-    $scope.cartData = { showDelete: false, summarySlide: false };
+    $scope.cartData = {};
 
-    $scope.cartTotal = null;
+    function initCartData() {
+        $scope.cartData.cart = cartService.getCurrentCart();
+        // Controls showing deletion buttons on summary view of cart
+        $scope.cartData.showDelete = false;
+        // Signals which slide is displayed in cart: full or summary
+        $scope.cartData.summarySlide = false;
+        // Current total value of items in cart
+        $scope.cartData.cartTotal = new Big(0);
+        // Disables Check Out button
+        $scope.cartData.cantCheckout = true;
+    }
+
+    initCartData();
 
     // Compute the subtotal for an item in the cart, then recompute the total.
-    this.doSubtotal = function doSubtotal(cartItem) {
+    function doSubtotal(cartItem) {
         cartItem.subtotal = cartItem.item.unitPrice.times(cartItem.quantity);
-        self.doTotal();
-    };
+        doTotal();
+    }
 
     // Total up all of the items in the cart.
-    this.doTotal = function doTotal() {
+    function doTotal() {
         var total = Big(0);
-        for (var i = 0; i < $scope.cart.length; ++i) {
-            total = total.plus($scope.cart[i].subtotal);
+        for (var i = 0; i < $scope.cartData.cart.length; ++i) {
+            total = total.plus($scope.cartData.cart[i].subtotal);
         }
-        $scope.cartTotal = total;
-    };
+        $scope.cartData.cartTotal = total;
+        $scope.cartData.cantCheckout = !$scope.cartData.cartTotal.gt(0);
+    }
 
+    // Tracking cart and cart summary slide views
     $scope.slideChanged = function slideChanged(index) {
         $scope.cartData.summarySlide = (index === 1);
     };
@@ -305,40 +362,39 @@ angular.module('produce.controllers', [])
     // Clear the cart
     $scope.emptyCart = function emptyCart() {
         cartService.emptyCart();
-        $scope.cartTotal = null;
+        $scope.cartData.cartTotal = new Big(0);
     };
 
     $scope.removeFromCart = function removeFromCart(cartItem) {
         cartService.removeFromCart(cartItem);
-        self.doTotal();
+        doTotal();
     };
 
     // Increment the quantity of an item in the cart by 1, then recompute prices.
     $scope.incrementQuantity = function incrementQuantity(i) {
-        ++$scope.cart[i].quantity;
-        self.doSubtotal($scope.cart[i]);
+        ++$scope.cartData.cart[i].quantity;
+        doSubtotal($scope.cartData.cart[i]);
     };
 
     // Decrement the quantity of an item in the cart by 1, then recompute prices.
     $scope.decrementQuantity = function decrementQuantity(i) {
-        if (($scope.cart[i].quantity - 1) >= 0) {
-            --$scope.cart[i].quantity;
-            self.doSubtotal($scope.cart[i]);
+        if (($scope.cartData.cart[i].quantity - 1) >= 0) {
+            --$scope.cartData.cart[i].quantity;
+            doSubtotal($scope.cartData.cart[i]);
         }
-        // TODO: Ask to delete item if 0?
     };
 
     // Increment the quantity of an item in the cart by .1, then recompute prices.
     $scope.incrementQuantityTenths = function incrementQuantityTenths(i) {
-        $scope.cart[i].quantity += .1;
-        self.doSubtotal($scope.cart[i]);
+        $scope.cartData.cart[i].quantity += .1;
+        doSubtotal($scope.cartData.cart[i]);
     };
 
     // Decrement the quantity of an item in the cart by .1, then recompute prices.
     $scope.decrementQuantityTenths = function decrementQuantityTenths(i) {
-        if (($scope.cart[i].quantity - .1) >= 0) {
-            $scope.cart[i].quantity -= .1;
-            self.doSubtotal($scope.cart[i]);
+        if (($scope.cartData.cart[i].quantity - .1) >= 0) {
+            $scope.cartData.cart[i].quantity -= .1;
+            doSubtotal($scope.cartData.cart[i]);
         }
     };
 
@@ -347,17 +403,16 @@ angular.module('produce.controllers', [])
             title: 'Delete from cart',
             template: 'Are you sure you want to delete ' + cartItem.item.name + ' from the cart?'
         })
-        .then(function(res) {
-            if (res) {
+        .then(function(confirmed) {
+            if (confirmed) {
                 $scope.removeFromCart(cartItem);
             }
         });
     };
 
-    // Initial entry.
-    // TODO: This goes away after "play" mode is over.
-    for (var i = 0; i < $scope.cart.length; ++i) {
-        self.doSubtotal($scope.cart[i]);
+    // Initial entry--if there is anything already in the cart.
+    for (var i = 0; i < $scope.cartData.cart.length; ++i) {
+        doSubtotal($scope.cartData.cart[i]);
     }
 
     /*
@@ -367,26 +422,23 @@ angular.module('produce.controllers', [])
     $ionicModal.fromTemplateUrl('templates/modal.add-cart-item.html', {
         scope: $scope
     }).then(function initAddItemModal(modal) {
-        self.addItemModal = modal;
+        $scope.addItemModal = modal;
     });
 
     // Close the modal.
     $scope.closeAddItem = function closeAddItem() {
-        self.addItemModal.hide();
+        $scope.addItemModal.hide();
     };
 
     // Show the modal
     $scope.showAddItem = function showAddItem() {
-        self.addItemModal.show();
+        $scope.addItemModal.show();
     };
 
     // Add an item to the cart.
     $scope.addItemToCart = function addItemToCart(item) {
-        // Quantity initialized to zero--may be off a scale.
-        // Make a copy of the item so that it doesn't change price during the sale.
-        // TODO: Put this construction into the service.
-        cartService.addItemToCart({ item: angular.copy(item), quantity: 0, subTotal: 0.00});
-        self.doSubtotal($scope.cart[$scope.cart.length - 1]);
+        cartService.addItemToCart(item);
+        doSubtotal($scope.cartData.cart[$scope.cartData.cart.length - 1]);
         $scope.closeAddItem();
     };
 
@@ -397,59 +449,72 @@ angular.module('produce.controllers', [])
     $ionicModal.fromTemplateUrl('templates/modal.checkout.html', {
         scope: $scope
     }).then(function initCheckOutModal(modal) {
-        self.checkOutModal = modal;
+        $scope.checkOutModal = modal;
     });
 
     // Close the modal
-    $scope.closeCheckOut = function closeCheckOut() {
-        self.checkOutModal.hide();
+    $scope.closeCheckOut = function closeCheckOut(reset) {
+        $scope.checkOutModal.hide();
+        if (reset) {
+            initCheckoutData();
+            $scope.emptyCart();
+            initCartData();
+            $state.go($scope.steps[$scope.checkoutData.currentStep].current.state);
+        } else {
+            // Reset this in case this was a failed sale.
+            $scope.checkoutData.saleCompleted = false;
+        }
     };
 
     // Show the modal
     $scope.showCheckOut = function showCheckOut() {
-        self.checkOutModal.show();
-        $state.go($scope.steps[$scope.currentStep].current.state);
+        $scope.checkOutModal.show();
+        $state.go($scope.steps[$scope.checkoutData.currentStep].current.state);
     };
 
     $scope.getTotalSale = function getTotalSale() {
         return $scope.checkoutData.amountTendered.minus($scope.checkoutData.changeGiven);
     };
 
+    function saveCallback(success, data) {
+        if (success) {
+            $scope.checkoutData.resetOnClose = true;
+            $scope.checkoutData.saleCompletedMessage = 'Sale complete. Sale number is ' + data.id;
+        } else {
+            $scope.checkoutData.resetOnClose = false;
+            $scope.checkoutData.saleCompletedMessage = 'Failed to write sale. Message: ' + data;
+        }
+        $scope.checkoutData.saveInProgress = false;
+        $scope.checkoutData.saleCompleted = true;
+    }
+
     // TODO: Control this in the promise from the service.
-    $scope.stillSaving = false;
     $scope.completeSale = function completeSale() {
-        $scope.stillSaving = true;
-        cartService.save(authService.getUser(), authService.getCurrentLocation(), $scope.checkoutData.amountTendered.minus($scope.checkoutData.changeGiven));
-        $timeout(function() {
-            $scope.stillSaving = false;
-            $timeout(function() {
-                // TODO: Re-init values accumulated during checkout.
-                $scope.closeCheckOut();
-                // TODO: Do the re-init after the window has closed.
-                $scope.currentStep = 0;
-                self.initCheckoutData();
-                $scope.emptyCart();
-                $state.go($scope.steps[$scope.currentStep].current.state);
-            }, 2000);
-        }, 3000);
+        $scope.checkoutData.saveInProgress = true;
+        var user = authService.getUser();
+        var currentLocation = authService.getCurrentLocation();
+        var totalCollected = $scope.checkoutData.amountTendered.minus($scope.checkoutData.changeGiven);
+        cartService.save(user, currentLocation, totalCollected, saveCallback);
     };
 
     // These are all properties that will be used by the modal. They are defined here so that the CheckoutController
     // can access them through its several states.
-    $scope.checkoutData = {
-        amountTendered: Big(0),
-        changeGiven: Big(0)
-    };
-
-    this.initCheckoutData = function() {
+    $scope.checkoutData = {};
+    function initCheckoutData() {
+        $scope.checkoutData.currentStep = 0;
         $scope.checkoutData.amountTendered = Big(0);
         $scope.checkoutData.changeGiven = Big(0);
-    };
+        $scope.checkoutData.resetOnClose = true; // If the save fails, this will be set to false
+        $scope.checkoutData.saveInProgress = false; // Controls the in-progress spinner and upper close button
+        $scope.checkoutData.saleCompleted = false; // Controls the OK button to close the modal
+        $scope.checkoutData.saleCompletedMessage = null; // Success or failure message
+    }
+    initCheckoutData();
 
     /*
      * State movement
      */
-    this.states = [
+    var states = [
         null,
         { name: 'Collect Money', state: 'app.cart.tenderMoney' },
         { name: 'Give Change', state: 'app.cart.handleChange' },
@@ -458,23 +523,23 @@ angular.module('produce.controllers', [])
     ];
 
     $scope.steps = [];
-    for (var j = 1; j < (this.states.length - 1); ++j) {
-        $scope.steps.push({ previous: this.states[j - 1], current: this.states[j], next: this.states[j + 1] });
+    for (var j = 1; j < (states.length - 1); ++j) {
+        $scope.steps.push({ previous: states[j - 1], current: states[j], next: states[j + 1] });
     }
 
-    $scope.currentStep = 0;
+    $scope.checkoutData.currentStep = 0;
 
     $scope.nextStep = function nextStep() {
-        if ($scope.steps.length > ($scope.currentStep + 1)) {
-            ++$scope.currentStep;
-            $state.go($scope.steps[$scope.currentStep].current.state);
+        if ($scope.steps.length > ($scope.checkoutData.currentStep + 1)) {
+            ++$scope.checkoutData.currentStep;
+            $state.go($scope.steps[$scope.checkoutData.currentStep].current.state);
         }
     };
 
     $scope.previousStep = function previousStep() {
-        if (-1 < ($scope.currentStep - 1)) {
-            --$scope.currentStep;
-            $state.go($scope.steps[$scope.currentStep].current.state);
+        if (-1 < ($scope.checkoutData.currentStep - 1)) {
+            --$scope.checkoutData.currentStep;
+            $state.go($scope.steps[$scope.checkoutData.currentStep].current.state);
         }
     };
 })
@@ -495,12 +560,12 @@ angular.module('produce.controllers', [])
     };
 
     $scope.changeDue = function changeDue() {
-        var due = $scope.checkoutData.amountTendered.minus($scope.cartTotal);
+        var due = $scope.checkoutData.amountTendered.minus($scope.cartData.cartTotal);
         return (due.lt(0)) ? Big(0) : due;
     };
 
     $scope.moneyDue = function changeDue() {
-        var due = $scope.cartTotal.minus($scope.checkoutData.amountTendered);
+        var due = $scope.cartData.cartTotal.minus($scope.checkoutData.amountTendered);
         return (due.lt(0)) ? Big(0) : due;
     };
 
@@ -527,5 +592,4 @@ angular.module('produce.controllers', [])
                 modal.show();
             });
     };
-
 });

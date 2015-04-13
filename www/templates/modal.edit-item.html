@@ -1,24 +1,25 @@
 <ion-modal-view>
     <ion-header-bar class="bar-positive">
-        <h1 class="title">Add Item</h1>
+        <h1 class="title"><span ng-show="formData.add">Add</span><span ng-hide="formData.add">Edit</span> Item</h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeEditItem()">Cancel</button>
         </div>
     </ion-header-bar>
     <ion-content class="padding">
-        <form name="itemForm" class="css-form" novalidate>
-            <table class="edit-table">
+        <form name="itemForm" ng-controller="FormHackController" class="css-form" ng-submit="saveEditItem()" novalidate>
+            <!-- ng-init is a hack for form/scope issues in ionic. -->
+            <table class="edit-table" ng-init="setForm(itemForm)">
                 <tr>
                     <th>Name:</th>
                     <td>
-                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="editItem.name">
+                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="formData.editItem.name">
                         <span ng-show="itemForm.name.$error.required" class="required-hint"></span>
                     </td>
                 </tr>
                 <tr>
                     <th>Unit Price:</th>
                     <td>
-                        <div dollar-input name="unitPrice" required ng-model="editItem.unitPrice"></div>
+                        <div dollar-input name="unitPrice" required ng-model="formData.editItem.unitPrice"></div>
                         <span ng-show="itemForm.unitPrice.$error.required" class="required-hint"></span>
                         <span ng-show="itemForm.unitPrice.$error.pattern" class="form-error">Numbers only.</span>
                     </td>
@@ -26,21 +27,21 @@
                 <tr>
                     <th>Units:</th>
                     <td>
-                        <select name="uom" ng-options="uom.name for uom in uoms track by uom.id" required ng-model="editItem.uom"></select>
+                        <select name="uom" ng-options="uom.name for uom in uoms track by uom.id" required ng-model="formData.editItem.uom"></select>
                         <span ng-show="itemForm.uom.$error.required" class="required-hint"></span>
                     </td>
                 </tr>
                 <tr>
                     <th>Is Active:</th>
                     <td>
-                        <input type="checkbox" ng-model="editItem.isActive">
+                        <input type="checkbox" ng-model="formData.editItem.isActive">
                     </td>
                 </tr>
                 <tr class="unruled">
                     <!-- TODO: File upload -->
                     <th rowspan="2">Image:</th>
                     <td>
-                        <img class="edit-item-img" ng-src="/img/items/{{editItem.image}}">
+                        <img class="edit-item-img" ng-src="/img/items/{{formData.editItem.image}}">
                     </td>
                 </tr>
                 <tr>
@@ -49,7 +50,9 @@
                     </td>
                 </tr>
             </table>
-            <button ng-disabled="!(itemForm.$valid && itemForm.$dirty)" class="button button-block button-positive" ng-click="saveEditItem()" type="button">Save Changes</button>
+            <button type="submit" ng-disabled="!(itemForm.$valid && itemForm.$dirty)" class="button button-block button-positive">
+                <span ng-show="formData.add">Submit Item</span><span ng-hide="formData.add">Save Changes</span>
+            </button>
         </form>
     </ion-content>
 </ion-modal-view>

@@ -2,7 +2,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var bcrypt = require('bcrypt');
 var userModel = require('../models/user');
-var protocol = require('../lib/protocol');
+var protocol = require('../www/js/protocol');
 
 passport.use(new LocalStrategy(function(name, password, done) {
     userModel.getWithPassword(name, function(err, user) {

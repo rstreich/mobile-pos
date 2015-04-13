@@ -1,6 +1,6 @@
-angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
+angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', 'ngResource', 'angularFileUpload'])
 
-.run(function ($ionicPlatform, $rootScope, $state, $ionicViewSwitcher) {
+.run(function ($ionicPlatform, $rootScope, $state, $ionicViewSwitcher, $window, $document) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -60,7 +60,6 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
         require: 'ngModel',
         scope: {
             ngModel: '=',
-            positiveOnly: '@', // TODO:
             name: '@',
             required: '@'
         },
@@ -69,8 +68,9 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
             var required = scope.hasOwnProperty('required');
 
             modelController.$render = function() {
-                console.log("Render called: " + modelController.$viewValue);
-                element.html(modelController.$viewValue);
+                if (modelController.$viewValue) {
+                    element.html(modelController.$viewValue);
+                }
             };
 
             element.attr('contenteditable', true);
@@ -78,7 +78,6 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
             element.on('input', function() {
                 scope.$apply(function() {
                     modelController.$setViewValue(element.html());
-                    console.log("Change applied.");
                 });
             });
 
@@ -87,12 +86,9 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
                     return modelValue;
                 }
                 if (!(modelValue instanceof Big)) {
-                    console.log("Formatter: Yeah, I set it: " + modelValue);
-                    console.log("Formatter: Model: " + typeof modelValue);
                     modelController.$setValidity('big', false);
                     return modelValue;
                 }
-                console.log("Formatter: Yeah, step 1: " + modelValue.toFixed(2));
                 modelController.$setValidity('big', true);
                 return modelValue.toFixed(2);
             }
@@ -100,8 +96,6 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
             modelController.$formatters.push(bigFormatter);
 
             function bigParser(domValue) {
-                console.log("Parser: I got called: " + domValue);
-                console.log("Parser: domValue: " + typeof domValue);
                 if (modelController.$isEmpty(domValue)) {
                     if (required) {
                         modelController.$setValidity('required', false);
@@ -123,7 +117,9 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services'])
     };
 })
 
-.config(function ($stateProvider, $urlRouterProvider) {
+.config(function ($httpProvider, $stateProvider, $urlRouterProvider) {
+    $httpProvider.interceptors.push('protocolInterceptor');
+
     $stateProvider
 
     .state('login', {

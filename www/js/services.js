@@ -1,5 +1,14 @@
 angular.module('produce.services', [])
 
+.service('errorService', function() {
+    this.reportError = function reportError(error, message) {
+        if (error) {
+            console.log(error);
+        }
+        console.log(message);
+    };
+})
+
 .service('authService', function($http, $ionicModal, locationService, userService) {
     // It's arguable that this belongs here, but the location is required to log in, so....
     this.currentLocation = null;
@@ -135,155 +144,192 @@ angular.module('produce.services', [])
     };
 })
 
-.service('userService', function($http, $q) {
-    this.users = [
-        { id: 1, name: 'robert', isAdmin: true, isActive: true },
-        { id: 2, name: 'garvey', isAdmin: true, isActive: true },
-        { id: 3, name: 'chelsie', isAdmin: false, isActive: true },
-        { id: 4, name: 'inactive', isAdmin: false, isActive: false },
-        { id: 5, name: 'joe', isAdmin: false, isActive: true },
-        { id: 6, name: 'sue', isAdmin: false, isActive: true }
-    ];
+.service('userService', function($resource) {
+    var User = $resource('/api/users/:id', { id: '@id' },
+        {
+            'update': { method:'PUT' }
+        });
+
+    this.newUser = function newUser(initial) {
+        return new User(initial);
+    };
 
     this.list = function list() {
-        return this.users;
+        return User.query();
     };
 
     this.get = function get(id) {
-        if (id <= this.users.length) {
-            return this.users[id - 1];
-        }
-        return null;
+        return User.get({ id: id });
     };
 
-    this.save = function save(user) {
-        // Insert
-        if (! user.id) {
-            user.id = this.users.length;
-            this.users.push(user);
+    this.save = function save(saveData, origUser, callback) {
+        if (!saveData.id) {
+            User.save(null, saveData, function saveSuccess(value) {
+                angular.extend(origUser, value);
+                if (callback) {
+                    return callback(origUser);
+                }
+            });
         } else {
-            // TODO: Copy data over.
+            User.update({id: saveData.id}, saveData, function updateSuccess(value) {
+                // Currently, value == saveData. The server doesn't return the updated version.
+                angular.extend(origUser, value);
+                if (callback) {
+                    return callback(origUser);
+                }
+            });
+        }
+    };
+})
+
+.service('locationService', function($resource) {
+    var Location = $resource('/api/locations/:id', { id: '@id' },
+        {
+            'update': { method:'PUT' }
+        });
+
+    this.newLocation = function newLocation(initial) {
+        return new Location(initial);
+    };
+
+    this.list = function list() {
+        return Location.query();
+    };
+
+    this.get = function get(id) {
+        return Location.get({ id: id });
+    };
+
+    this.save = function save(saveData, origLocation, callback) {
+        if (! saveData.id) {
+            Location.save(null, saveData, function saveSuccess(value) {
+                angular.extend(origLocation, value);
+                if (callback) {
+                    return callback(origLocation);
+                }
+            });
+        } else {
+            Location.update({ id: saveData.id }, saveData, function updateSuccess(value) {
+                // Currently, value == saveData. The server doesn't return the updated version.
+                angular.extend(origLocation, value);
+                if (origLocation.pwd) {
+                    delete origLocation.pwd;
+                }
+                if (callback) {
+                    return callback(origLocation);
+                }
+            });
+        }
+    };
+})
+
+.service('uomService', function($resource) {
+    var Uom = $resource('/api/uoms/:id', { id: '@id' },
+        {
+            'update': { method:'PUT' }
+        });
+
+    this.newUom = function newUom(initial) {
+        return new Uom(initial);
+    };
+
+    this.list = function list() {
+        return Uom.query();
+    };
+
+    this.get = function get(id) {
+        return Uom.get({ id: id });
+    };
+
+    this.save = function save(saveData, origUom, callback) {
+        if (! saveData.id) {
+            Uom.save(null, saveData, function saveSuccess(value) {
+                angular.extend(origUom, value);
+                if (callback) {
+                    return callback(origUom);
+                }
+            });
+        } else {
+            Uom.update({ id: saveData.id }, saveData, function updateSuccess(value) {
+                // Currently, value == saveData. The server doesn't return the updated version.
+                angular.extend(origUom, value);
+                if (callback) {
+                    return callback(origUom);
+                }
+            });
+        }
+    };
+})
+
+.service('itemService', function($resource, $http) {
+    var Item = $resource('/api/items/:id', { id: '@id' },
+        { // Prices have to get changed from Strings to Bigs.
+            'update': { method:'PUT' },
+            'query': { method: 'GET', isArray: true, transformResponse: addTransform($http.defaults.transformResponse, transformResponse) },
+            'get': { method: 'GET', transformResponse: addTransform($http.defaults.transformResponse, transformResponse) },
+            'save': { method: 'POST', transformResponse: addTransform($http.defaults.transformResponse, transformResponse) }
+        });
+
+    function transformResponse(data, headersGetter, status) {
+        if (data && data.data) {
+            var items = angular.isArray(data.data) ? data.data : [ data.data ];
+            for (var i = 0; i < items.length; ++i) {
+                if (items[i].unitPrice) {
+                    items[i].unitPrice = Big(items[i].unitPrice);
+                }
+            }
+        }
+        return data;
+    }
+
+    function addTransform(defaults, transform) {
+        var ret = angular.isArray(defaults) ? defaults : [defaults];
+        return ret.concat(transform);
+    }
+
+    this.newItem = function newItem(initial) {
+        return new Item(initial);
+    };
+
+    this.list = function list() {
+        return Item.query();
+    };
+
+    this.get = function get(id) {
+        return Item.get({ id: id });
+    };
+
+    // There isn't a way to roll back changes to the instance, so, only update the original after a successful update
+    // or insert.
+    this.save = function save(saveData, origItem, callback) {
+        if (! saveData.id) {
+            Item.save(null, saveData, function saveSuccess(value) {
+                angular.extend(origItem, value);
+                if (callback) {
+                    return callback(origItem);
+                }
+            });
+        } else {
+            Item.update({ id: saveData.id }, saveData, function updateSuccess(value) {
+                // Currently, value == saveData. The server doesn't return the updated version.
+                angular.extend(origItem, value);
+                if (callback) {
+                    return callback(origItem);
+                }
+            });
         }
     }
 })
 
-.service('locationService', function($http, $q) {
-    this.locations = [
-        { id: 1, name: 'Fargo'},
-        { id: 2, name: 'Moorhead'},
-        { id: 3, name: 'Your place'},
-        { id: 4, name: 'My place'},
-        { id: 5, name: 'Their place'}
-    ];
+.service('cartService', function($resource) {
+    var Sale = $resource('/api/sales/:id', { id: '@id' });
 
-    this.list = function list() {
-        return this.locations;
-    };
-
-    this.get = function get(id) {
-        if (id <= this.locations.length) {
-            return this.locations[id - 1];
-        }
-        return null;
-    };
-
-    this.save = function save(location) {
-        // Insert
-        if (!location.id) {
-            location.id = this.locations.length;
-            this.locations.push(location);
-        } else {
-            // TODO: Copy data over.
-        }
-    }
-})
-
-.service('uomService', function($http, $q) {
-    this.uoms = [
-        { id: 1, name: 'each'},
-        { id: 2, name: 'lb.'},
-        { id: 3, name: 'dozen'},
-        { id: 4, name: 'pint'},
-        { id: 5, name: 'quart'}
-    ];
-
-    this.list = function list() {
-        return this.uoms;
-    };
-
-    this.get = function get(id) {
-        if (id <= this.uoms.length) {
-            return this.uoms[id - 1];
-        }
-        return null;
-    };
-
-    this.save = function save(uom) {
-        // Insert
-        if (! uom.id) {
-            uom.id = this.uoms.length;
-            this.uoms.push(uom);
-        } else {
-            // TODO: Copy data over.
-        }
-    }
-})
-
-.service('itemService', function($http, $q) {
-    this.items = [
-        {id: 1, name: 'Discount', uom: { id: 1, name: 'each' }, unitPrice: Big('1.00'), isActive: true, image: 'discount.png'},
-        {id: 2, name: 'Donation', uom: { id: 1, name: 'each' }, unitPrice: Big('1.00'), isActive: true, image: 'donation.png'},
-        {id: 3, name: 'Asparagus', uom: { id: 2, name: 'lb.' }, unitPrice: Big('2.34'), isActive: true, image: 'asparagus.png'},
-        {id: 4, name: 'Carrots', uom: { id: 2, name: 'lb.' }, unitPrice: Big('1.10'), isActive: true, image: 'carrots.png'},
-        {id: 5, name: 'Cherry Tomatoes', uom: { id: 2, name: 'lb.' }, unitPrice: Big('1.95'), isActive: true, image: 'cherry-tomatoes.png'},
-        {id: 6, name: 'Cucumbers', uom: { id: 2, name: 'lb.' }, unitPrice: Big('0.48'), isActive: true, image: 'cucumbers.png'},
-        {id: 7, name: 'Red Raspberries', uom: { id: 4, name: 'pint' }, unitPrice: Big('6.45'), isActive: true, image: 'raspberries.png'},
-        {id: 8, name: 'Radishes', uom: { id: 2, name: 'lb.' }, unitPrice: Big('0.60'), isActive: true, image: 'red-radishes.png'},
-        {id: 9, name: 'Strawberries', uom: { id: 2, name: 'lb.' }, unitPrice: Big('4.56'), isActive: true, image: 'strawberries.png'},
-        {id: 10, name: 'Sweet Corn', uom: { id: 3, name: 'dozen' }, unitPrice: Big('2.00'), isActive: true, image: 'sweet-corn.png'},
-        {id: 11, name: 'Tomatoes', uom: { id: 2, name: 'lb.' }, unitPrice: Big('1.69'), isActive: true, image: 'tomatoes.png'}
-    ];
-
-    this.list = function list() {
-        return this.items;
-    };
-
-    this.get = function get(id) {
-        if (id <= this.items.length) {
-            return this.items[id - 1];
-        }
-        return null;
-    };
-
-    this.save = function save(item) {
-        // Insert
-        if (! item.id) {
-            item.id = this.items.length;
-            this.items.push(item);
-        } else {
-            // TODO: Nothing now. Item was edited.
-        }
-    }
-})
-
-// TODO: Get rid of ItemService as a dependency
-.service('cartService', function($http, $q, itemService) {
-    var items = itemService.list();
-
-    this.cart = [
-        { item: items[2], quantity: 1, subtotal: Big(0)},
-        { item: items[3], quantity: 1, subtotal: Big(0)},
-        { item: items[4], quantity: 1, subtotal: Big(0)},
-        { item: items[5], quantity: 1, subtotal: Big(0)},
-        { item: items[6], quantity: 1, subtotal: Big(0)},
-        { item: items[7], quantity: 1, subtotal: Big(0)},
-        { item: items[8], quantity: 1, subtotal: Big(0)},
-        { item: items[9], quantity: 1, subtotal: Big(0)},
-        { item: items[10], quantity: 1, subtotal: Big(0)}
-    ];
+    this.cart = [];
 
     this.addItemToCart = function addItemToCart(item) {
-        this.cart.push(item);
+        // Quantity initialized to zero--may be off a scale.
+        // Make a copy of the item so that it doesn't change price during the sale.
+        this.cart.push({ item: angular.extend({}, item), quantity: 0, subTotal: new Big(0)});
     };
 
     this.getCurrentCart = function getCurrentCart() {
@@ -301,7 +347,19 @@ angular.module('produce.services', [])
         this.cart.splice(0, this.cart.length);
     };
 
-    this.save = function save(user, location, totalCollected) {
+    this.save = function save(user, location, totalCollected, callback) {
+        var sale = { soldBy: user, location: location, totalCollected: totalCollected, soldItems: this.cart };
+        Sale.save(sale,
+            function saveSuccess(value, responseHeaders) {
+                if (callback) {
+                    return callback(true, value);
+                }
+            },
+            function saveFailure(httpResponse) {
+                if (callback) {
+                    return callback(false, httpResponse.data.message || httpResponse.data.error);
+                }
+            });
     }
 })
 
@@ -382,5 +440,54 @@ angular.module('produce.services', [])
             init: init
         };
     };
+})
+
+.factory('jsonProtocol', function($window) {
+    return $window.protocol;
+})
+
+.factory('protocolInterceptor', function($q, errorService, jsonProtocol) {
+    function iDontCare(s) {
+        return s.lastIndexOf('/api/', 0) !== 0;
+    }
+    return {
+        request: function requestProtocolInterceptor(config) {
+            if (iDontCare(config.url)) {
+                return config;
+            }
+            if (config.data) {
+                config.data = jsonProtocol.wrap(config, config.data);
+            }
+            return config;
+        },
+
+        requestError: function requestErrorProtocolInterceptor(rejection) {
+            if (iDontCare(rejection.config.url)) {
+                return rejection;
+            }
+            console.log(angular.toJson(rejection));
+            return $q.reject(rejection);
+        },
+
+        response: function responseProtocolInterceptor(response) {
+            if (iDontCare(response.config.url)) {
+                return response;
+            }
+            var ret = jsonProtocol.unWrap(response.data);
+            // TODO: Check for errors here.
+            response.data = ret ? ret.data : null;
+            return response;
+        },
+
+        responseError: function responseErrorProtocolInterceptor(rejection) {
+            if (iDontCare(rejection.config.url)) {
+                return rejection;
+            }
+            var ret = jsonProtocol.unWrap(rejection.data);
+            rejection.data = ret;
+            console.log(angular.toJson(ret));
+            return $q.reject(rejection);
+        }
+    }
 });
 

@@ -1,5 +1,5 @@
 var locationModel = require('../models/location');
-var protocol = require('../lib/protocol');
+var protocol = require('../www/js/protocol');
 
 //PROTECTED: Admin only
 exports.get = function getLocation(req, res) {
@@ -47,7 +47,9 @@ exports.insert = function insertLocation(req, res) {
         if (err) {
             return protocol.writeError(500, req, res, err);
         }
-        return protocol.writeMessage(201, req, res, 'Location ' + location.name + ' added. ID: ' + results.insertId, true);
+        var newUrl = req.originalUrl + '/' + results.insertId;
+        location.id = results.insertId;
+        return protocol.writeCreated(req, res, location, newUrl);
     });
 };
 
@@ -64,11 +66,10 @@ exports.update = function updateLocation(req, res) {
     // Validate input.
     if (!location) {
         return protocol.writeError(400, req, res, 'No location provided.');
-    } else if (location.id && location.id !== id) {
+    } else if (location.id !== id) {
         return protocol.writeError(400, req, res, 'Location ID in JSON(' + location.id + ') does not match specified ID: ' + id);
     }
     
-    location.id = id;
     return locationModel.update(location, function updateLocationCallback(err, results) {
         if (err) {
             return protocol.writeError(500, req, res, err);

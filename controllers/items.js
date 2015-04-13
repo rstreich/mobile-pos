@@ -3,7 +3,7 @@
  */
 
 var itemModel = require('../models/item');
-var protocol = require('../lib/protocol');
+var protocol = require('../www/js/protocol');
 
 exports.get = function getItem(req, res) {
     var id = Number(req.params.id);
@@ -54,7 +54,9 @@ exports.insert = function insertItem(req, res) {
         if (err) {
             return protocol.writeError(500, req, res, err);
         }
-        return protocol.writeMessage(201, req, res, 'Item ' + item.name + ' added. ID: ' + results.insertId, true);
+        var newUrl = req.originalUrl + '/' + results.insertId;
+        item.id = results.insertId;
+        return protocol.writeCreated(req, res, item, newUrl);
     });
 };
 
@@ -71,11 +73,10 @@ exports.update = function updateItem(req, res) {
     // Validate input.
     if (!item) {
         return protocol.writeError(400, req, res, 'No item provided.');
-    } else if (item.id && item.id !== id) {
+    } else if (item.id !== id) {
         return protocol.writeError(400, req, res, 'Item ID in JSON(' + item.id + ') does not match specified ID: ' + id);
     }
     
-    item.id = id;
     return itemModel.update(item, function updateItemCallback(err, results) {
         if (err) {
             return protocol.writeError(500, req, res, err);

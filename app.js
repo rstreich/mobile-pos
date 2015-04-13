@@ -13,6 +13,7 @@ var clientRoot = path.join(__dirname, 'www');
 var imageRoot = path.join(clientRoot, 'img');
 
 // Routes
+var auth = require('./routes/auth');
 var users = require('./routes/users');
 var locations = require('./routes/locations');
 var items = require('./routes/items');
@@ -47,11 +48,12 @@ app.use(passport.session());
 app.use(express.static(clientRoot));
 //app.use(express.static(path.join(__dirname, 'bower_components')));
 
-app.use('/users', users);
-app.use('/locations', locations);
-app.use('/items', items);
-app.use('/uoms', uoms);
-app.use('/sales', sales);
+app.use('/api', auth);
+app.use('/api/users', users);
+app.use('/api/locations', locations);
+app.use('/api/items', items);
+app.use('/api/uoms', uoms);
+app.use('/api/sales', sales);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
