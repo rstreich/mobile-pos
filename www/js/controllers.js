@@ -1,23 +1,21 @@
 angular.module('produce.controllers', [])
 // TODO: Ensure all vars that appear in models are prefixed with "data."
 // TODO: Update updates on success.
-// TODO: Edit modals need forms set to clean on view open
 /*
  * Controller for the login page.
  */
 .controller('AuthController', function($scope, $state, authService) {
-    // Current hack to work around issues of state transition away from a state that disappeards on logout.
-    $scope.$on('$ionicView.enter', function viewEnterLogout() {
-        authService.logout();
-    });
-
     $scope.loginData = { username: null, password: null };
 
     $scope.login = function login() {
         // TODO: Real login and failure handling.
-        authService.login($scope.loginData.username, $scope.loginData.password);
-        $state.go('app.catalog');
-        $scope.loginData = { username: null, password: null };
+        authService.login($scope.loginData.username, $scope.loginData.password, function(err) {
+            if (err) {
+                return console.log('Oops. Login failed.');
+            }
+            $state.go('app.catalog');
+            $scope.loginData = { username: null, password: null };
+        });
     };
 })
 
@@ -69,8 +67,8 @@ angular.module('produce.controllers', [])
 .controller('AppCtrl', function($scope, $ionicModal, $state, authService) {
     $scope.logout = function logout() {
         // TODO: Clean up data.
+        authService.logout();
         $state.go('login');
-        // TODO: authService.logout();
     };
 
     $scope.getCurrentLocation = function getCurrentLocation() {
@@ -118,7 +116,7 @@ angular.module('produce.controllers', [])
 /*
  * Controller for an admin-only section--items.
  */
-.controller('ItemsController', function($scope, $ionicModal, itemService, uomService, keypadService) {
+.controller('ItemsController', function($scope, $ionicModal, $upload, itemService, uomService, authService) {
     $scope.uoms = uomService.list();
     $scope.items = itemService.list();
 
@@ -144,6 +142,26 @@ angular.module('produce.controllers', [])
         $scope.formData.origItem = item || itemService.newItem({ id: null, name: '', isActive: true, unitPrice: null, image: 'no-image.png', uom: null });
         $scope.formData.editItem = angular.extend({}, $scope.formData.origItem);
         $scope.editItemModal.show();
+    };
+
+    $scope.imageFileSelected = function imageFileSelected(fileArray) {
+        if (1 > fileArray.length) {
+            return;
+        }
+        var file = fileArray[0];
+        $upload.upload({
+            url: '/api/images',
+            fields: { 'username': authService.getUser().name },
+            file: file
+        }).progress(function uploadProgress(event) {
+            // TODO: Useful?
+            //var progressPercentage = parseInt(100.0 * event.loaded / event.total);
+        }).success(function uploadSuccess(data, status, headers, config) {
+            $scope.formData.editItem.image = data.image;
+        }).error(function uploadError(response, status, getHeaderField, httpRequest) {
+            // TODO: How and where to report errors.
+            console.log(response);
+        });
     };
 
     function itemNameCompare(left, right) {

@@ -9,23 +9,17 @@ angular.module('produce.services', [])
     };
 })
 
-.service('authService', function($http, $ionicModal, locationService, userService) {
+.service('authService', function($http, $ionicModal, $window, locationService, userService) {
     // It's arguable that this belongs here, but the location is required to log in, so....
     this.currentLocation = null;
     // TODO: Make go away when through playing.
     this.user = { id: 1, name: 'Robert', isActive: true, isAdmin: true };
 
     this.getUser = function getUser() {
-        if (!this.user) {
-            return null;
-        }
         return this.user;
     };
 
     this.getCurrentLocation = function getCurrentLocation() {
-        if (!this.currentLocation) {
-            return null;
-        }
         return this.currentLocation;
     };
 
@@ -44,22 +38,37 @@ angular.module('produce.services', [])
         return !!this.user;
     };
 
-    this.login = function login(username, password) {
-        // TODO: Real login
-        this.user = {id: 1, name: username, isActive: true, isAdmin: username === 'admin'};
+    this.login = function login(username, password, callback) {
+        var self = this;
+        $http
+            .post('/api/login', { username: username, password: password })
+            .success(function(data, status, headers, config) {
+                console.log('Tucked away my token.');
+                $window.sessionStorage.token = data.token;
+                self.user = data.user;
+                return callback(null);
+            })
+            .error(function (data, status, headers, config) {
+                delete $window.sessionStorage.token;
+                console.log(data);
+                // TODO: Get error message.
+                return callback('Invalid user or password');
+            });
     };
 
     this.changePasswordModal = function changePassword(password) {
-        userService.save({ id: user.id, password: password });
+        userService.save({ name: this.user.name, password: password });
     };
 
-    this.logout = function logout(id) {
+    this.logout = function logout() {
         // This is a hack because of the issues with state changes.
         if (this.user) {
-            // TODO: Real logout.
+            // Ignoring results.
+            $http.post('/api/logout', { user: this.user.name });
             this.user = null;
         }
         this.currentLocation = null;
+        delete $window.sessionStorage.token;
     };
 
     /*
@@ -489,5 +498,29 @@ angular.module('produce.services', [])
             return $q.reject(rejection);
         }
     }
-});
+})
 
+.factory('authInterceptor', function ($rootScope, $q, $window) {
+    function iDontCare(s) {
+        return s.lastIndexOf('/api/', 0) !== 0;
+    }
+    return {
+        request: function(config) {
+            if (iDontCare(config.url)) {
+                return config;
+            }
+            config.headers = config.headers || {};
+            if ($window.sessionStorage.token) {
+                config.headers.Authorization = 'Bearer ' + $window.sessionStorage.token;
+            }
+            return config;
+        },
+        response: function(response) {
+            // TODO:
+            if (response.status === 401) {
+                console.log('Foo!');
+            }
+            return response || $q.when(response);
+        }
+    };
+});

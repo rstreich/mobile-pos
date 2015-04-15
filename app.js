@@ -2,11 +2,9 @@ var express = require('express');
 var path = require('path');
 var favicons = require('connect-favicons');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var passport = require('passport');
-var session = require('express-session');
-var multer = require('multer');
+
+var protocol = require('./www/js/protocol.js');
 
 // All client side stuff--not fighting the angular generator
 var clientRoot = path.join(__dirname, 'www');
@@ -19,6 +17,7 @@ var locations = require('./routes/locations');
 var items = require('./routes/items');
 var uoms = require('./routes/uoms');
 var sales = require('./routes/sales');
+var images = require('./routes/images');
 
 var app = express();
 
@@ -28,27 +27,21 @@ app.set('view engine', 'jade');
 
 app.use(favicons(path.join(imageRoot, 'icons')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({
-    putSingleFilesInArray: true, // Will be default behavior in future release
-    dest: path.join(imageRoot, 'items'),
-    rename: function (fieldname, filename, req, res) {
-        return filename + Date.now()
-    },
-    onFileUploadComplete: function (file, req, res) {
-        // Use this to trigger update of item view?
-    }
-    }));
-app.use(cookieParser());
-app.use(session({ secret: 'some gobbledygook', resave: false, saveUninitialized: false }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(express.static(clientRoot));
 //app.use(express.static(path.join(__dirname, 'bower_components')));
 
+var imageUploadConfig = {
+    uploadPath: path.join(imageRoot, 'uploads'),
+    imagePath: path.join(imageRoot, 'items')
+};
+
+app.use(bodyParser.json({}));
+//app.use(bodyParser.urlencoded({ extended: false }));
+
+// Map all of the routes.
 app.use('/api', auth);
+app.use('/api/images', images(imageUploadConfig));
 app.use('/api/users', users);
 app.use('/api/locations', locations);
 app.use('/api/items', items);
@@ -63,6 +56,10 @@ app.use(function(req, res, next) {
 });
 
 // error handlers
+app.use(function jsonErrorHandler(err, req, res, next) {
+    // TODO: Flesh this out.
+    protocol.writeError(err.status || 500, req, res, err);
+});
 
 // development error handler
 // will print stacktrace

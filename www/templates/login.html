@@ -10,8 +10,9 @@
                     <input type="text" ng-model="loginData.username" required placeholder="Username">
                 </label>
                 <label class="item item-input-inset">
-                    <input type="password" ng-model="loginData.password" required minlength="8" placeholder="Password">
+                    <input type="password" ng-model="loginData.password" required placeholder="Password">
                 </label>
+                <!-- TODO: Put login failure message here. -->
                 <button ng-disabled="!loginForm.$valid" class="item button button-block button-positive" type="submit">Log in</button>
             </div>
         </form>

@@ -19,12 +19,6 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
     };
 })
 
-.filter('activeStyle', function() {
-    return function(isActive) {
-        return (isActive ? '' : {'background-color': 'yellow'});
-    }
-})
-
 .filter('dollars', function() {
     return function(input, addSymbol) {
         if (!input || !(input instanceof Big)) {
@@ -34,7 +28,7 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
     };
 })
 
-.directive("compareTo", function() {
+.directive('compareTo', function() {
     return {
         require: "ngModel",
         scope: {
@@ -54,6 +48,7 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
     };
 })
 
+// TODO: Replace contenteditable with input.
 .directive('dollarInput', function() {
     return {
         restrict: 'A',
@@ -109,6 +104,9 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
                     return undefined;
                 }
                 modelController.$setValidity('pattern', true);
+                if (domValue == '.') {
+                    return undefined;
+                }
                 return new Big(domValue);
             }
 

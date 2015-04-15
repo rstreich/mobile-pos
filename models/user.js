@@ -33,7 +33,7 @@ var orderBy = ' ORDER BY name';
 
 var existsQuery = factory.makeSimpleGet('SELECT name from ' + tableName + ' FORCE INDEX WHERE ? LIMIT 1');
 var getQuery = factory.makeSimpleGet('SELECT ' + fields + ' from ' + tableName + ' WHERE ?');
-var getPasswordQuery = factory.makeSimpleGet('SELECT ' + allFields + ' from ' + tableName + ' where ? AND isActive > 0');
+var getWithPasswordQuery = factory.makeSimpleGet('SELECT ' + allFields + ' from ' + tableName + ' where ? AND isActive > 0');
 var getAllQuery = factory.makeSimpleGetAll('SELECT ' + fields + ' from ' + tableName + orderBy);
 var getAllActiveQuery = factory.makeSimpleGetAll('SELECT ' + fields + ' from ' + tableName + ' WHERE isActive > 0' + orderBy);
 var insertQuery = factory.makeSimpleInsert('INSERT INTO ' + tableName + ' SET ?');
@@ -50,8 +50,8 @@ exports.getAll = function getAll(callback, includeInactive) {
     return getAllActiveQuery(callback);
 };
 
-exports.getWithPassword = function getWithPassword(id, callback) {
-    return getPasswordQuery({ id: id }, callback);
+exports.getWithPassword = function getWithPassword(name, callback) {
+    return getWithPasswordQuery({ name: name }, callback);
 };
 
 exports.insert = function insert(user, callback) {

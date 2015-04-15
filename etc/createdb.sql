@@ -63,10 +63,15 @@ CREATE TABLE SoldItems (
 );
 
 INSERT INTO Locations SET id = 1, name = 'admin';
-INSERT INTO UnitsOfMeasure SET id = 1, name = 'each';
-INSERT INTO Items(id, name, uom, unitPrice) VALUES 
- (1, 'Discounted Amount', 1, -1),
- (2, 'Donated Amount', 1, 1);
+INSERT INTO UnitsOfMeasure(id, name) VALUES
+ (1, 'each'),
+ (2, 'lb.'),
+ (3, 'dozen'),
+ (4, 'quart'),
+ (5, 'pint');
+INSERT INTO Items(id, name, uom, unitPrice, image) VALUES
+ (1, 'Discounted Amount', 1, -1, 'discount.png'),
+ (2, 'Donated Amount', 1, 1, 'donation.png');
 
 -- play data
 INSERT INTO Users(name, pwd) VALUES ('Fooble', password('feeble'));

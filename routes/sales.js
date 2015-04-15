@@ -4,9 +4,9 @@ var sales = require('../controllers/sales');
 var auth = require('../controllers/auth');
 
 var root = router.route('/');
-root.post(auth.verifyAuthenticated, sales.insert);
+root.post(sales.insert);
 
 var specifiedItem = router.route('/:id');
-specifiedItem.get(auth.verifyAuthenticated, sales.get);
+specifiedItem.get(sales.get);
 
 module.exports = router;

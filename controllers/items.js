@@ -37,7 +37,8 @@ exports.getAll = function getAllItems(req, res) {
 //PROTECTED: Admin only
 exports.insert = function insertItem(req, res) {
     // Make a pristine object
-    var item = itemModel.createItem(protocol.getJsonInput(req));
+    var inboundItem = protocol.getJsonInput(req);
+    var item = itemModel.createItem(inboundItem);
     // Validate input.
     if (!item) {
         return protocol.writeError(400, req, res, 'No item provided.');
@@ -56,11 +57,11 @@ exports.insert = function insertItem(req, res) {
         }
         var newUrl = req.originalUrl + '/' + results.insertId;
         item.id = results.insertId;
+        item.uom = inboundItem.uom; // Restore the complete object at uom
         return protocol.writeCreated(req, res, item, newUrl);
     });
 };
 
-// TODO: Check req.files for image name
 //PROTECTED: Admin or self only
 exports.update = function updateItem(req, res) {
     var id = Number(req.params.id);
