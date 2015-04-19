@@ -37,7 +37,7 @@
                 <button class="money-button" ng-click="setTendered(cartData.cartTotal)">Full Amount: {{cartData.cartTotal | dollars:true}}</button>
                 <button class="money-button" ng-click="clearTendered()">Reset</button>
             </div>
-            <button class="button button-block button-positive" ng-show="steps[checkoutData.currentStep].next" ng-click="nextStep()">{{steps[checkoutData.currentStep].current.name}}</button>
+            <button ng-disabled="!checkoutData.amountTendered.gt(0)" class="button button-block button-positive" ng-show="steps[checkoutData.currentStep].next" ng-click="nextStep()">{{steps[checkoutData.currentStep].current.name}}</button>
         </script>
 
         <script id="part.handle-change.html" type="text/ng-template">

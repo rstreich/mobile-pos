@@ -14,7 +14,7 @@
     </ion-tab>
 
     <!-- Admin Tab -->
-    <ion-tab ng-show="isAdminUser()" title="Admin" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/app/admin">
+    <ion-tab class="{{viewIfAdmin()}}" title="Admin" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/app/admin">
         <ion-nav-view name="tab-admin"></ion-nav-view>
     </ion-tab>
 </ion-tabs>

@@ -59,7 +59,7 @@ exports.login = function(req, res, next) {
             return next(err);
         }
         var trimmedUser = { id: user.id, name: user.name, isAdmin: user.isAdmin };
-        var token = jwt.sign(trimmedUser, secret, jwtSignConfig);
+        var token = jwt.sign(copyUserData(trimmedUser), secret, jwtSignConfig);
         protocol.writeData(req, res, { token: token, user: trimmedUser });
     });
 };
@@ -110,8 +110,8 @@ function withinGracePeriod(expirationDateInSeconds) {
     return Date.now() < ((expirationDateInSeconds * 1000) + (tokenGracePeriodMinutes * 60000))
 }
 
-function getUserFromToken(decoded) {
-    return {id: decoded.id, name: decoded.name, isAdmin: decoded.isAdmin};
+function copyUserData(decoded) {
+    return { id: decoded.id, name: decoded.name, isAdmin: decoded.isAdmin };
 }
 
 /*
@@ -133,9 +133,10 @@ exports.ping = function(req, res, next) {
         if (decoded && isExpired) {
             // Are we in the grace period?
             if (withinGracePeriod(decoded.exp)) {
-                var user = getUserFromToken(decoded);
-                var token = jwt.sign(user, secret, jwtSignConfig);
-                return protocol.writeData(req, res, { token: token, user: user });
+                copyUserData(decoded);
+                // sign() decorates the object. Sigh.
+                var token = jwt.sign(copyUserData(decoded), secret, jwtSignConfig);
+                return protocol.writeData(req, res, { token: token, user: copyUserData(decoded) });
             }
             return res.sendStatus(401);
         }
@@ -166,7 +167,7 @@ function makeMiddleware() {
                     return res.sendStatus(401);
                 }
                 // Attach the user to the request.
-                req.auth = getUserFromToken(decoded);
+                req.auth = copyUserData(decoded);
                 // All good. Just pass it on.
                 return next();
             }
@@ -191,7 +192,7 @@ exports.verifyAdmin = function verifyAdmin(req, res, next) {
     if (req.auth && req.auth.isAdmin) {
          return next();
     } else {
-         return res.send(403);
+         return res.sendStatus(403);
     }
 };
 

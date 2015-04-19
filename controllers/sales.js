@@ -6,50 +6,51 @@ var saleModel = require('../models/sale');
 var itemModel = require('../models/item');
 var protocol = require('../www/js/protocol');
 var Big = require('big.js');
-var inspect = require('util').inspect;
+var ServerError = require('../lib/server-error');
 
-exports.get = function getSale(req, res) {
+exports.get = function getSale(req, res, next) {
     var id = Number(req.params.id);
     if (Number.isNaN(id)) {
-        return protocol.writeError(400, req, res, 'Invalid ID: ' + req.params.id);
+        return next(new ServerError(400, 'Invalid ID: ' + req.params.id), null);
     }
     return saleModel.get(id, function writeGetResult(err, results) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
         if (!results) {
-            return protocol.writeError(404, req, res, 'No sale found for sale ID: ' + id);
+            return next(new ServerError(404, 'No sale found for sale ID: ' + id));
         }
         return protocol.writeData(req, res, results);
     });
 };
 
-exports.insert = function insertSale(req, res) {
+exports.insert = function insertSale(req, res, next) {
+    console.log(JSON.stringify(req.body.data));
     // Make a pristine object
     var sale = saleModel.createSale(protocol.getJsonInput(req));
     // Validate input.
     if (!sale) {
-        return protocol.writeError(400, req, res, 'No sale provided.');
+        return next(new ServerError(400, 'No sale provided.', null));
     } else if (!sale.location) {
-        return protocol.writeError(400, req, res, 'Missing location.');
+        return next(new ServerError(400, 'Missing location.', null));
     } else if (!sale.soldBy) {
-        return protocol.writeError(400, req, res, 'Missing sold by.');
+        return next(new ServerError(400, 'Missing sold by.', null));
     } else if (!sale.totalCollected) {
         // TODO: Validate is a number?
-        return protocol.writeError(400, req, res, 'Missing total price.');
+        return next(new ServerError(400, 'Missing total price.', null));
     } else if (!sale.soldItems) {
-        return protocol.writeError(400, req, res, 'Missing list of items sold.');
+        return next(new ServerError(400, 'Missing list of items sold.', null));
     } else {
         var actualTotal = new Big(0);
         // We know it's either null or an array.
         for (var i = 0; i < sale.soldItems.length; ++i) {
             var soldItem = sale.soldItems[i];
             if (!soldItem.quantity) {
-                return protocol.writeError(400, req, res, 'Missing quantity.');
+                return next(new ServerError(400, 'Missing quantity.', null));
             } else if (!soldItem.unitPrice) {
-                return protocol.writeError(400, req, res, 'Missing unit price.');
+                return next(new ServerError(400, 'Missing unit price.', null));
             } else if (!soldItem.item) {
-                return protocol.writeError(400, req, res, 'Missing item.');
+                return next(new ServerError(400, 'Missing item.', null));
             }
             actualTotal = actualTotal.plus(soldItem.unitPrice.times(soldItem.quantity));
         }
@@ -66,7 +67,7 @@ exports.insert = function insertSale(req, res) {
 
     return saleModel.insert(sale, function saleInsertCallback(err, sale) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
         // We're only returning the ID to the client--it's not displayed currently.
         var newUrl = req.originalUrl + '/' + sale.id;

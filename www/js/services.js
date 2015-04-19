@@ -27,11 +27,11 @@ angular.module('produce.services', [])
     };
 
     this.getCurrentLocation = function getCurrentLocation() {
-        return $window.sessionStorage.current;
+        return angular.fromJson($window.sessionStorage.location);
     };
 
     this.setCurrentLocation = function setCurrentLocation(location) {
-        return $window.sessionStorage.location = location;
+        return $window.sessionStorage.location = angular.toJson(location);
     };
 
     this.getToken = function getToken() {
@@ -56,6 +56,10 @@ angular.module('produce.services', [])
         $window.sessionStorage.user = angular.toJson(data.user);
     }
 
+    /**
+     *
+     * @returns {promise}
+     */
     this.isAuthenticated = function isAuthenticated() {
         var deferred = $q.defer();
         if (!this.getUser()) {
@@ -71,7 +75,7 @@ angular.module('produce.services', [])
                 })
                 .error(function(data, status, headers, config) {
                     initProfile();  // Reset
-                    deferred.reject(new Error('Token invalid.'));
+                    deferred.reject({ reason: 'tokenExpired' });
                 });
         }
         return deferred.promise;
@@ -195,7 +199,10 @@ angular.module('produce.services', [])
         return new User(initial);
     };
 
-    this.list = function list() {
+    this.list = function list(includeInactive) {
+        if (includeInactive) {
+            return User.query({ inactive: true });
+        }
         return User.query();
     };
 
@@ -332,7 +339,10 @@ angular.module('produce.services', [])
         return new Item(initial);
     };
 
-    this.list = function list() {
+    this.list = function list(includeInactive) {
+        if (includeInactive) {
+            return Item.query({ inactive: true });
+        }
         return Item.query();
     };
 

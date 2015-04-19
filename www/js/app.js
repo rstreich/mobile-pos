@@ -18,9 +18,16 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
         $state.go(here);
     };
 
-    $rootScope.$on('$stateChangeError', function() {
-        // Redirect to login page
-        $state.go('login');
+    $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+        if (error && error.reason) {
+            if (error.reason === 'unauthorized') {
+                return $state.go(fromState.name);
+            } else if (error.reason === 'tokenExpired') {
+                // Redirect to login page
+                // TODO: Put a message up on the login screen.
+                return $state.go('login');
+            }
+        }
     });
 
     $rootScope.$on('AuthenticationTimeout', function authenticationTimeout() {
@@ -163,8 +170,14 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
             }
         },
         resolve: {
-            authenticated: function(authService) {
-                return authService.isAdmin();
+            isAdmin: function($q, $state, authService) {
+                var deferred = $q.defer();
+                if (authService.isAdmin()) {
+                    deferred.resolve();
+                } else {
+                    deferred.reject({ reason: 'unauthorized' });
+                }
+                return deferred.promise;
             }
         }
     })
@@ -214,7 +227,7 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
         views: {
             'tab-catalog': {
                 templateUrl: "templates/catalog.html",
-                controller: 'ItemsController'
+                controller: 'CatalogController'
             }
         }
     })

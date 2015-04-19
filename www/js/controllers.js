@@ -75,8 +75,8 @@ angular.module('produce.controllers', [])
         return authService.getUser();
     };
 
-    $scope.isAdminUser = function isAdminUser() {
-        return authService.isAdmin();
+    $scope.viewIfAdmin = function viewIfAdmin() {
+        return authService.isAdmin() ? 'ng-show' : 'ng-hide';
     };
 
     /*
@@ -113,8 +113,10 @@ angular.module('produce.controllers', [])
  * Controller for an admin-only section--items.
  */
 .controller('ItemsController', function($scope, $ionicModal, $upload, itemService, uomService, authService) {
+    // TODO: Find a way to place a toggle button on the UI? If not, remove the condition and make it fixed.
+    $scope.includeInactive = true;
     $scope.uoms = uomService.list();
-    $scope.items = itemService.list();
+    $scope.items = itemService.list($scope.includeInactive);
 
     /*
      * Edit item modal
@@ -183,7 +185,9 @@ angular.module('produce.controllers', [])
  * Admin-only section--user management.
  */
 .controller('UsersController', function($scope, $ionicModal, userService) {
-    $scope.users = userService.list();
+    // TODO: Find a way to place a toggle button on the UI? If not, remove the condition and make it fixed.
+    $scope.includeInactive = true;
+    $scope.users = userService.list($scope.includeInactive);
 
     /*
      * Edit user modal
@@ -326,6 +330,13 @@ angular.module('produce.controllers', [])
 })
 
 /*
+ * Ultra simple for listing 'catalog' views.
+ */
+.controller('CatalogController', function($scope, itemService) {
+    $scope.items = itemService.list();
+})
+
+/*
  * The biggest chunk--managing the shopping cart--all client side. Nothing sent to server until sale is completed.
  * Not intended to be a persistent shopping cart.
  */
@@ -333,7 +344,7 @@ angular.module('produce.controllers', [])
 .controller('CartController', function($scope, $state, $ionicModal, $ionicPopup, itemService, cartService, authService) {
     var self = this;
 
-    // Used to selecta new item for the cart.
+    // Used to select a new item for the cart.
     $scope.items = itemService.list();
 
     $scope.cartData = {};
