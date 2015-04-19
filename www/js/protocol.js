@@ -18,12 +18,17 @@
     };
 
     // Client-side:
-    exports.unWrap = function unWrap(data) {
-        if (!data) {
+    exports.unWrap = function unWrap(responseData) {
+        // TODO: Serious rethink needed here. Look at discards in protocol interceptor. Really unhappy.
+        if (!responseData) {
             return null;
         }
-        // TODO: Add success value
-        return { data: data.data || null, message: data.message || null, error: data.error || null };
+        if (responseData.apiVersion) {
+            // TODO: Add success value--maybe
+            return { data: responseData.data || null, message: responseData.message || null, error: responseData.error || null };
+        } else { // On token refresh/retries, we hit here twice.
+            return { data: responseData };
+        }
     };
 
     // Future use function for verifying compatibility, etc. Just get the data object for now.
@@ -51,7 +56,6 @@
         var ret = new JsonObject(req.originalUrl);
         ret.message = message;
         ret.success = success;
-        // TODO: protect with type check
         res.status(code);
         res.json(ret);
     };
@@ -70,10 +74,11 @@
     /**
      *
      */
+    // TODO: Get code from error object.
     exports.writeError = function writeJsonError(code, req, res, err) {
         var ret = new JsonObject(req.originalUrl);
-        ret.error = err;
-        // TODO: protect with type check
+        // TODO: stack always?
+        ret.error = { status: err.status || 500, message: err.message, stack: err.stack };
         res.status(code);
         res.json(ret);
     };

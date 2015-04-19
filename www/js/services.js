@@ -9,66 +9,98 @@ angular.module('produce.services', [])
     };
 })
 
-.service('authService', function($http, $ionicModal, $window, locationService, userService) {
+.service('authService', function($http, $ionicModal, $window, $q, locationService, userService) {
     // It's arguable that this belongs here, but the location is required to log in, so....
-    this.currentLocation = null;
-    // TODO: Make go away when through playing.
-    this.user = { id: 1, name: 'Robert', isActive: true, isAdmin: true };
+    function initProfile() {
+        $window.sessionStorage.user = null;
+        $window.sessionStorage.location = null;
+        $window.sessionStorage.token = null;
+    }
+
+    // Test to see if there is a value--survive page refresh.
+    if ($window.sessionStorage.getItem('user') === null) {
+        initProfile();
+    }
 
     this.getUser = function getUser() {
-        return this.user;
+        return angular.fromJson($window.sessionStorage.user);
     };
 
     this.getCurrentLocation = function getCurrentLocation() {
-        return this.currentLocation;
+        return $window.sessionStorage.current;
     };
 
     this.setCurrentLocation = function setCurrentLocation(location) {
-        return this.currentLocation = location;
+        return $window.sessionStorage.location = location;
+    };
+
+    this.getToken = function getToken() {
+        return $window.sessionStorage.token;
     };
 
     this.isAdmin = function isAdmin() {
-        if (!this.user) {
+        var user = this.getUser();
+        if (!user) {
             return false;
         }
-        return this.user.isAdmin;
+        return user.isAdmin;
     };
 
+    // Clean up if the token has expired.
+    this.clearSession = function clearSession() {
+        initProfile();
+    };
+
+    function setToken(data) {
+        $window.sessionStorage.token = data.token;
+        $window.sessionStorage.user = angular.toJson(data.user);
+    }
+
     this.isAuthenticated = function isAuthenticated() {
-        return !!this.user;
+        var deferred = $q.defer();
+        if (!this.getUser()) {
+            deferred.reject('Not logged in');
+        } else {
+            $http.get('/api/auth/ping')
+                .success(function(data, status, headers, config) {
+                    if (data) {
+                        // Refreshed token.
+                        setToken(data);
+                    }
+                    deferred.resolve();
+                })
+                .error(function(data, status, headers, config) {
+                    initProfile();  // Reset
+                    deferred.reject(new Error('Token invalid.'));
+                });
+        }
+        return deferred.promise;
     };
 
     this.login = function login(username, password, callback) {
-        var self = this;
         $http
-            .post('/api/login', { username: username, password: password })
+            .post('/api/auth/login', { username: username, password: password })
             .success(function(data, status, headers, config) {
-                console.log('Tucked away my token.');
-                $window.sessionStorage.token = data.token;
-                self.user = data.user;
-                return callback(null);
+                if (data) {
+                    setToken(data);
+                } else {
+                    // TODO: Error condition here. Check status?
+                }
+                return callback();
             })
             .error(function (data, status, headers, config) {
-                delete $window.sessionStorage.token;
-                console.log(data);
+                initProfile();
                 // TODO: Get error message.
-                return callback('Invalid user or password');
+                return callback(data.error);
             });
     };
 
     this.changePasswordModal = function changePassword(password) {
-        userService.save({ name: this.user.name, password: password });
+        userService.save({ name: this.getUser().name, password: password });
     };
 
     this.logout = function logout() {
-        // This is a hack because of the issues with state changes.
-        if (this.user) {
-            // Ignoring results.
-            $http.post('/api/logout', { user: this.user.name });
-            this.user = null;
-        }
-        this.currentLocation = null;
-        delete $window.sessionStorage.token;
+        initProfile();
     };
 
     /*
@@ -366,7 +398,9 @@ angular.module('produce.services', [])
             },
             function saveFailure(httpResponse) {
                 if (callback) {
-                    return callback(false, httpResponse.data.message || httpResponse.data.error);
+                    // TODO: Message handling.
+                    console.log(httpResponse.data);
+                    return callback(false, httpResponse.data.message || (httpResponse.data.error ? httpResponse.data.error.message : 'None'));
                 }
             });
     }
@@ -375,7 +409,6 @@ angular.module('produce.services', [])
 .service('keypadService', function($ionicModal) {
 
     this.getKeypadModal = function getKeypadModal() {
-        var service = this;
         var ionicModal = $ionicModal;
 
         var init = function initPickLocationModal($scope, callback) {
@@ -451,13 +484,69 @@ angular.module('produce.services', [])
     };
 })
 
+.service('retryService', function($q, $injector) {
+    var pending = [];
+    var refreshing = false;
+
+    function retry(savedResponse) {
+        var http = $injector.get('$http');
+        http(savedResponse.response.config).then(
+            function retrySuccess(response) {
+                savedResponse.deferred.resolve(response);
+            },
+            function retryFailure(response) {
+                savedResponse.deferred.reject(response);
+            }
+        );
+    }
+
+    function retryAll() {
+        var savedResponse = pending.shift();
+        while (savedResponse) {
+            retry(savedResponse);
+            savedResponse = pending.shift();
+        }
+    }
+
+    function rejectAll() {
+        var savedResponse = pending.shift();
+        while (savedResponse) {
+            savedResponse.deferred.reject(request.response);
+            savedResponse = pending.shift();
+        }
+    }
+
+    this.enqueueRequest = function retryRequest(response) {
+        var deferred = $q.defer();
+        pending.push({ response: response, deferred: deferred });
+        return deferred.promise;
+    };
+
+    this.refreshAndRetry = function refreshAndRetry() {
+        if (refreshing) {
+            // Already started--advantages of single thread
+            return;
+        }
+        refreshing = true;
+        $injector.get('authService').isAuthenticated().then(
+            function refreshSuccess() {
+                retryAll();
+                refreshing = false;
+            },
+            function refreshFailure() {
+                rejectAll();
+                refreshing = false;
+            });
+    };
+})
+
 .factory('jsonProtocol', function($window) {
     return $window.protocol;
 })
 
 .factory('protocolInterceptor', function($q, errorService, jsonProtocol) {
     function iDontCare(s) {
-        return s.lastIndexOf('/api/', 0) !== 0;
+        return !/^\/api\//.test(s);
     }
     return {
         request: function requestProtocolInterceptor(config) {
@@ -472,9 +561,10 @@ angular.module('produce.services', [])
 
         requestError: function requestErrorProtocolInterceptor(rejection) {
             if (iDontCare(rejection.config.url)) {
-                return rejection;
+                return $q.reject(rejection);
             }
-            console.log(angular.toJson(rejection));
+            var ret = jsonProtocol.unWrap(rejection.data);
+            rejection.data = ret;
             return $q.reject(rejection);
         },
 
@@ -490,37 +580,50 @@ angular.module('produce.services', [])
 
         responseError: function responseErrorProtocolInterceptor(rejection) {
             if (iDontCare(rejection.config.url)) {
-                return rejection;
+                return $q.reject(rejection);
             }
             var ret = jsonProtocol.unWrap(rejection.data);
             rejection.data = ret;
-            console.log(angular.toJson(ret));
             return $q.reject(rejection);
         }
     }
 })
 
-.factory('authInterceptor', function ($rootScope, $q, $window) {
+.factory('authInterceptor', function ($rootScope, $q, $window, $injector, retryService) {
     function iDontCare(s) {
-        return s.lastIndexOf('/api/', 0) !== 0;
+        return !/^\/api\//.test(s);
     }
+
     return {
-        request: function(config) {
+        request: function requestAuthInterceptor(config) {
             if (iDontCare(config.url)) {
                 return config;
             }
             config.headers = config.headers || {};
-            if ($window.sessionStorage.token) {
-                config.headers.Authorization = 'Bearer ' + $window.sessionStorage.token;
+            var token = $injector.get('authService').getToken();
+            if (token) {
+                config.headers.Authorization = 'Bearer ' + token;
             }
             return config;
         },
-        response: function(response) {
-            // TODO:
-            if (response.status === 401) {
-                console.log('Foo!');
+
+        responseError: function responseErrorAuthInterceptor(rejection) {
+            if (iDontCare(rejection.config.url)) {
+                return $q.reject(rejection);
             }
-            return response || $q.when(response);
+            if (rejection.config.url === '/api/auth/ping') {
+                // Ping requests are already handled.
+                return $q.reject(rejection);
+            }
+
+            if (rejection.status === 401) {
+                $rootScope.$broadcast('AuthenticationTimeout');
+            } else if (rejection.status === 419) {
+                var promise = retryService.enqueueRequest(rejection);
+                $rootScope.$emit('TokenExpired');
+                return promise;
+            }
+            return $q.reject(rejection);
         }
     };
 });

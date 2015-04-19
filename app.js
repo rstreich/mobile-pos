@@ -5,6 +5,7 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 
 var protocol = require('./www/js/protocol.js');
+var auth2 = require('./controllers/auth');
 
 // All client side stuff--not fighting the angular generator
 var clientRoot = path.join(__dirname, 'www');
@@ -31,6 +32,8 @@ app.use(logger('dev'));
 app.use(express.static(clientRoot));
 //app.use(express.static(path.join(__dirname, 'bower_components')));
 
+app.use('/api', auth2.verifyAuthenticated);
+
 var imageUploadConfig = {
     uploadPath: path.join(imageRoot, 'uploads'),
     imagePath: path.join(imageRoot, 'items')
@@ -40,7 +43,7 @@ app.use(bodyParser.json({}));
 //app.use(bodyParser.urlencoded({ extended: false }));
 
 // Map all of the routes.
-app.use('/api', auth);
+app.use('/api/auth', auth);
 app.use('/api/images', images(imageUploadConfig));
 app.use('/api/users', users);
 app.use('/api/locations', locations);
@@ -58,6 +61,11 @@ app.use(function(req, res, next) {
 // error handlers
 app.use(function jsonErrorHandler(err, req, res, next) {
     // TODO: Flesh this out.
+    if (err.status === 404) {
+        return next(err);
+    }
+    console.log('Error: ' + JSON.stringify(err));
+    console.log(err.stack);
     protocol.writeError(err.status || 500, req, res, err);
 });
 

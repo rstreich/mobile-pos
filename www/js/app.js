@@ -1,6 +1,6 @@
 angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', 'ngResource', 'angularFileUpload'])
 
-.run(function ($ionicPlatform, $rootScope, $state, $ionicViewSwitcher, $window, $document) {
+.run(function ($ionicPlatform, $rootScope, $state, $ionicViewSwitcher, $injector) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -17,6 +17,20 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
         $ionicViewSwitcher.nextDirection('back');
         $state.go(here);
     };
+
+    $rootScope.$on('$stateChangeError', function() {
+        // Redirect to login page
+        $state.go('login');
+    });
+
+    $rootScope.$on('AuthenticationTimeout', function authenticationTimeout() {
+        $state.go('login');
+        $injector.get('authService').clearSession();
+    });
+
+    $rootScope.$on('TokenExpired', function handleTokenExpiration() {
+        $injector.get('retryService').refreshAndRetry();
+    });
 })
 
 .filter('dollars', function() {
@@ -117,6 +131,7 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
 
 .config(function ($httpProvider, $stateProvider, $urlRouterProvider) {
     $httpProvider.interceptors.push('protocolInterceptor');
+    $httpProvider.interceptors.push('authInterceptor');
 
     $stateProvider
 
@@ -132,7 +147,12 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
         url: "/app",
         abstract: true,
         templateUrl: "templates/tabs.html",
-        controller: 'AppCtrl'
+        controller: 'AppCtrl',
+        resolve: {
+            authenticated: function(authService) {
+                return authService.isAuthenticated();
+            }
+        }
     })
 
     .state('app.admin', {
@@ -140,6 +160,11 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
         views: {
             'tab-admin': {
                 templateUrl: "templates/admin.html"
+            }
+        },
+        resolve: {
+            authenticated: function(authService) {
+                return authService.isAdmin();
             }
         }
     })

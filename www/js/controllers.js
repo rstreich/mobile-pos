@@ -11,7 +11,7 @@ angular.module('produce.controllers', [])
         // TODO: Real login and failure handling.
         authService.login($scope.loginData.username, $scope.loginData.password, function(err) {
             if (err) {
-                return console.log('Oops. Login failed.');
+                return console.log(err.message);
             }
             $state.go('app.catalog');
             $scope.loginData = { username: null, password: null };
@@ -29,10 +29,6 @@ angular.module('produce.controllers', [])
     }).then(function(popover) {
         $scope.userInfoPopover = popover;
     });
-
-    $scope.isAuthenticated = function isAuthenticated() {
-        return authService.isAuthenticated();
-    };
 
     $scope.getUsername = function getUsername() {
         var user = authService.getUser();

@@ -17,6 +17,7 @@
 
     <!-- angular resource -->
     <script src="lib/angular-resource/angular-resource.min.js"></script>
+    <!-- script src="js/my-resource/angular-resource.js"></script -->
 
     <!-- currency handling -->
     <script src="lib/big.min.js"></script>
@@ -37,7 +38,7 @@
 <body ng-app="produce" ng-controller="IndexController">
 <ion-nav-bar class="bar-positive">
     <ion-nav-buttons side="left">
-        <button class="button button-icon ion-more" ng-show="isAuthenticated()" ng-click="userInfoPopover.show($event)"></button>
+        <button class="button button-icon ion-more" ng-show="getUsername()" ng-click="userInfoPopover.show($event)"></button>
     </ion-nav-buttons>
 </ion-nav-bar>
 <ion-nav-view></ion-nav-view>
