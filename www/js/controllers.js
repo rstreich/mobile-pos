@@ -20,9 +20,8 @@ angular.module('produce.controllers', [])
 })
 
 .controller('IndexController', function($scope, $ionicPopover, authService) {
-    var self = this;
-    this.locationPickerModal = authService.getLocationModal();
-    this.changePasswordModal = authService.getChangePasswordModal();
+    $scope.locationPickerModal = authService.getLocationModal(true);
+    $scope.changePasswordModal = authService.getChangePasswordModal();
 
     $ionicPopover.fromTemplateUrl('templates/popover.user-info.html', {
         scope: $scope
@@ -32,7 +31,7 @@ angular.module('produce.controllers', [])
 
     $scope.getUsername = function getUsername() {
         var user = authService.getUser();
-        return !user ? '' : user.name;
+        return user ? user.name : '';
     };
 
     $scope.getLocationName = function getLocationName() {
@@ -42,7 +41,7 @@ angular.module('produce.controllers', [])
 
     $scope.showLocationPicker = function showLocationPicker() {
         $scope.userInfoPopover.hide();
-        self.locationPickerModal.init($scope)
+        $scope.locationPickerModal.init($scope)
             .then(function(modal) {
                 modal.show();
             });
@@ -50,7 +49,7 @@ angular.module('produce.controllers', [])
 
     $scope.showChangePassword = function showChangePassword() {
         $scope.userInfoPopover.hide();
-        self.changePasswordModal.init($scope)
+        $scope.changePasswordModal.init($scope)
             .then(function(modal) {
                 modal.show();
             });
@@ -61,42 +60,14 @@ angular.module('produce.controllers', [])
  * This is the controller for the abstract "app" state--the one the tabs are loaded with.
  */
 .controller('AppCtrl', function($scope, $ionicModal, $state, authService) {
+
     $scope.logout = function logout() {
-        // TODO: Clean up data.
         authService.logout();
         $state.go('login');
     };
 
-    $scope.getCurrentLocation = function getCurrentLocation() {
-        return authService.getCurrentLocation();
-    };
-
-    $scope.getUser = function getUser() {
-        return authService.getUser();
-    };
-
     $scope.viewIfAdmin = function viewIfAdmin() {
         return authService.isAdmin() ? 'ng-show' : 'ng-hide';
-    };
-
-    /*
-     * Select location modal--All transactions have to be associated with a location. This will get their location.
-     * This can only happen after authentication.
-     */
-    //$ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
-    //    scope: $scope
-    //}).then(function initPickLocationModal(modal) {
-    //    $scope.pickLocationModal = modal;
-    //}).then(function verifyLocationSelected() {
-        // On first entry, set the location
-        // TODO: Switch to "$ionicView.enter"?
-        //if (!$scope.getCurrentLocation()) {
-        //    $scope.showPickLocation();
-        //}
-    //});
-
-    // TODO: Replace with new model when we want to turn this back on.
-    $scope.showPickLocation = function showPickLocation() {
     };
 })
 
@@ -342,8 +313,6 @@ angular.module('produce.controllers', [])
  */
 // TODO: Move cart totalling, etc. into cartService. Consider richer Cart and CartItem objects.
 .controller('CartController', function($scope, $state, $ionicModal, $ionicPopup, itemService, cartService, authService) {
-    var self = this;
-
     // Used to select a new item for the cart.
     $scope.items = itemService.list();
 
@@ -567,6 +536,29 @@ angular.module('produce.controllers', [])
             $state.go($scope.steps[$scope.checkoutData.currentStep].current.state);
         }
     };
+
+    /*
+     * Select location modal--All transactions have to be associated with a location. This will get their location.
+     * This can only happen after authentication.
+     */
+    $scope.locationPickerModal = authService.getLocationModal(false);
+
+    $scope.getCurrentLocation = function getCurrentLocation() {
+        return authService.getCurrentLocation();
+    };
+
+    $scope.showLocationPicker = function showLocationPicker() {
+        $scope.locationPickerModal.init($scope)
+            .then(function(modal) {
+                modal.show();
+            });
+    };
+
+    $scope.$on('$ionicView.enter', function(event) {
+        if (!$scope.getCurrentLocation()) {
+            $scope.showLocationPicker();
+        }
+    });
 })
 
 .controller('CheckoutController', function($scope, keypadService) {

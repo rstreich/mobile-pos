@@ -1,51 +1,52 @@
 var locationModel = require('../models/location');
+var ServerError = require('../lib/server-error');
 var protocol = require('../www/js/protocol');
 
 //PROTECTED: Admin only
-exports.get = function getLocation(req, res) {
+exports.get = function getLocation(req, res, next) {
     var id = Number(req.params.id);
     if (Number.isNaN(id)) {
-        return protocol.writeError(400, req, res, 'Invalid ID: ' + req.params.id);
+        return next(new ServerError(400, 'Invalid ID: ' + req.params.id, null));
     }
     return locationModel.get(id, function writeGetResult(err, results) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
         if (!results || 1 > results.length) {
-            return protocol.writeError(404, req, res, 'No location found for location ID: ' + id);
+            return next(new ServerError(404, 'No location found for location ID: ' + id, null));
         }
         return protocol.writeData(req, res, results[0]);
     });
 };
 
 //PROTECTED: Admin only
-exports.getAll = function getAllLocations(req, res) {
+exports.getAll = function getAllLocations(req, res, next) {
   return locationModel.getAll(function writeGetAllResult(err, results) {
       if (err) {
-          return protocol.writeError(500, req, res, err);
+          return next(new ServerError(500, null, err));
       }
       if (!results || 1 > results.length) {
-          return protocol.writeError(404, req, res, 'No locations found');
+          return next(new ServerError(404, 'No locations found', null));
       }
       return protocol.writeData(req, res, results);
   });
 };
 
 //PROTECTED: Admin only
-exports.insert = function insertLocation(req, res) {
+exports.insert = function insertLocation(req, res, next) {
     // Make a pristine object
     var location = locationModel.createLocation(protocol.getJsonInput(req));
     
     // Validate input.
     if (!location) {
-        return protocol.writeError(400, req, res, 'No location provided.');
+        return next(new ServerError(400, 'No location provided.', null));
     } else if (!location.name) {
-        return protocol.writeError(400, req, res, 'No location name specified.');
+        return next(new ServerError(400, 'No location name specified.', null));
     }
     
     return locationModel.insert(location, function locationInsertCallback(err, results) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
         var newUrl = req.originalUrl + '/' + results.insertId;
         location.id = results.insertId;
@@ -54,10 +55,10 @@ exports.insert = function insertLocation(req, res) {
 };
 
 //PROTECTED: Admin only
-exports.update = function updateLocation(req, res) {
+exports.update = function updateLocation(req, res, next) {
     var id = Number(req.params.id);
     if (Number.isNaN(id)) {
-        return protocol.writeError(400, req, res, 'Invalid ID: ' + req.params.id);
+        return next(new ServerError(400, 'Invalid ID: ' + req.params.id, null));
     }
     
     // Make a pristine object
@@ -65,16 +66,18 @@ exports.update = function updateLocation(req, res) {
     
     // Validate input.
     if (!location) {
-        return protocol.writeError(400, req, res, 'No location provided.');
+        return next(new ServerError(400, 'No location provided.', null));
     } else if (location.id !== id) {
-        return protocol.writeError(400, req, res, 'Location ID in JSON(' + location.id + ') does not match specified ID: ' + id);
+        return next(new ServerError(400, 'Location ID in JSON(' + location.id + ') does not match specified ID: ' + id, null));
     }
     
     return locationModel.update(location, function updateLocationCallback(err, results) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
-        var success = 0 < results.affectedRows;
-        return protocol.writeMessage(success ? 200 : 400, req, res, success ? 'Location ' + id + ' updated.' : 'Failed to update location: ' + id, success);
+        if (1 > results.affectedRows) {
+            return next(new ServerError(400, 'Failed to update location: ' + id, null));
+        }
+        return protocol.writeMessage(200, req, res, 'Location ' + id + ' updated.');
     });
 };

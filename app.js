@@ -3,6 +3,8 @@ var path = require('path');
 var favicons = require('connect-favicons');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var bunyan = require('bunyan');
+var ServerError = require('./lib/server-error');
 
 var protocol = require('./www/js/protocol.js');
 var auth2 = require('./controllers/auth');
@@ -19,6 +21,11 @@ var items = require('./routes/items');
 var uoms = require('./routes/uoms');
 var sales = require('./routes/sales');
 var images = require('./routes/images');
+
+var log = bunyan.createLogger({
+    name: 'produce',
+    serializers: require('./lib/log-serializers')
+});
 
 var app = express();
 
@@ -53,19 +60,16 @@ app.use('/api/sales', sales);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
+  var err = new ServerError(404, 'Not Found', null);
   next(err);
 });
 
 // error handlers
 app.use(function jsonErrorHandler(err, req, res, next) {
-    // TODO: Flesh this out.
     if (err.status === 404) {
         return next(err);
     }
-    console.log('Error: ' + JSON.stringify(err));
-    console.log(err.stack);
+    log.error({ req: req, err: err });
     protocol.writeError(err.status || 500, req, res, err);
 });
 

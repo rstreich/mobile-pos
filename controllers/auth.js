@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt');
 var async = require('async');
 var unless = require('express-unless');
 var userModel = require('../models/user');
+var ServerError = require('../lib/server-error');
 var protocol = require('../www/js/protocol');
 
 var inspect = require('util').inspect;
@@ -11,7 +12,7 @@ var audience = 'produceApi';
 var issuer = 'produce';
 // Total lifespan = tokenExpirationMinutes + tokenGracePeriodMinutes
 var tokenExpirationMinutes = 1;
-var tokenGracePeriodMinutes = 30;
+var tokenGracePeriodMinutes = 1440;
 
 var secret = 'gobbledygook';
 
@@ -29,17 +30,13 @@ function verifyPassword(username, password, done) {
         }
         var user = result[0];
         if (!user) {
-            var error = new Error('No user found for username: ' + username);
-            error.status = 400;
-            return done(error);
+            return done(new ServerError(400, 'No user found for username: ' + username, null));
         }
         return bcrypt.compare(password, user.pwd, function(err, valid) {
             if (err) {
                 return done(err);
             } else if (!valid){
-                var error = new Error('Invalid password.');
-                error.status = 400;
-                return done(error);
+                return done(new ServerError(400, 'Invalid password.', null));
             } else {
                 return done(null, user);
             }
@@ -50,9 +47,7 @@ function verifyPassword(username, password, done) {
 exports.login = function(req, res, next) {
     var data = protocol.getJsonInput(req);
     if (!data) {
-        var error = new Error('No user provided.');
-        error.status = 400;
-        return next(error);
+        return next(new ServerError(400, 'No user provided.', null));
     }
     verifyPassword(data.username, data.password, function authenticate(err, user) {
         if (err) {
@@ -78,20 +73,14 @@ function getToken(req, callback) {
             if (/^Bearer$/i.test(scheme)) {
                 token = credentials;
             } else {
-                var badSchemeError = new Error('Format is Authorization: Bearer [token]');
-                badSchemeError.status = 401;
-                return callback(badSchemeError);
+                return callback(new ServerError(401, 'Format is Authorization: Bearer [token]', null));
             }
         } else {
-            var badFormatError = new Error('Format is "Authorization: Bearer [token]"');
-            badFormatError.status = 401;
-            return callback(badFormatError);
+            return callback(new ServerError(401, 'Format is Authorization: Bearer [token]', null));
         }
         return callback(null, token);
     }
-    var noAuthError = new Error('No authorization found.');
-    noAuthError.status = 401;
-    return callback(noAuthError);
+    return callback(new ServerError(401, 'No authorization found.', null));
 }
 
 function verifyToken(token, callback) {
@@ -171,7 +160,7 @@ function makeMiddleware() {
                 // All good. Just pass it on.
                 return next();
             }
-            return next(new Error('Failed to get authorization token.'));
+            return next(new ServerError(500, 'Failed to get authorization token.', null));
         });
     };
     middleware.unless = unless;
@@ -179,14 +168,6 @@ function makeMiddleware() {
 }
 
 exports.verifyAuthenticated = makeMiddleware().unless({ path: [/^\/api\/auth/]});
-
-//TODO: Stubs for now.
-var passThrough = function passThrough(req, res, next) {
-    next();
-};
-
-//exports.verifyAuthenticated = passThrough;
-exports.verifySelfUpdate = passThrough;
 
 exports.verifyAdmin = function verifyAdmin(req, res, next) {
     if (req.auth && req.auth.isAdmin) {
@@ -196,11 +177,16 @@ exports.verifyAdmin = function verifyAdmin(req, res, next) {
     }
 };
 
-//exports.verifySelfUpdate = function verifySelfUpdate(req, res, next) {
-// var targetUsername = req.params || req.params.name || '#########';
-// if (targetUsername === req.user.name) {
-//     return next();
-// } else {
-//     return res.send(403);
-// }
-//};
+exports.verifySelfUpdate = function verifySelfUpdate(req, res, next) {
+    if (!req.auth) {
+        return res.sendStatus(401);
+    }
+    var user = protocol.getJsonInput(req);
+    if (!user) {
+        return next(new ServerError(400, 'No user provided.', null));
+    }
+    if (req.auth.id != user.id) {
+        return res.sendStatus(403);
+    }
+    return next();
+};

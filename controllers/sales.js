@@ -11,23 +11,23 @@ var ServerError = require('../lib/server-error');
 exports.get = function getSale(req, res, next) {
     var id = Number(req.params.id);
     if (Number.isNaN(id)) {
-        return next(new ServerError(400, 'Invalid ID: ' + req.params.id), null);
+        return next(new ServerError(400, 'Invalid ID: ' + req.params.id, null));
     }
     return saleModel.get(id, function writeGetResult(err, results) {
         if (err) {
             return next(new ServerError(500, null, err));
         }
         if (!results) {
-            return next(new ServerError(404, 'No sale found for sale ID: ' + id));
+            return next(new ServerError(404, 'No sale found for sale ID: ' + id, null));
         }
         return protocol.writeData(req, res, results);
     });
 };
 
 exports.insert = function insertSale(req, res, next) {
-    console.log(JSON.stringify(req.body.data));
     // Make a pristine object
-    var sale = saleModel.createSale(protocol.getJsonInput(req));
+    var jsonInput = protocol.getJsonInput(req);
+    var sale = saleModel.createSale(jsonInput);
     // Validate input.
     if (!sale) {
         return next(new ServerError(400, 'No sale provided.', null));
@@ -36,7 +36,6 @@ exports.insert = function insertSale(req, res, next) {
     } else if (!sale.soldBy) {
         return next(new ServerError(400, 'Missing sold by.', null));
     } else if (!sale.totalCollected) {
-        // TODO: Validate is a number?
         return next(new ServerError(400, 'Missing total price.', null));
     } else if (!sale.soldItems) {
         return next(new ServerError(400, 'Missing list of items sold.', null));

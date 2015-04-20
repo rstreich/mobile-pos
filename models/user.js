@@ -59,6 +59,7 @@ exports.insert = function insert(user, callback) {
 };
 
 exports.update = function update(user, callback) {
+    console.log(JSON.stringify(user));
     return updateQuery({ id: user.id }, user, callback);
 };
 

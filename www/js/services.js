@@ -1,5 +1,5 @@
 angular.module('produce.services', [])
-
+// TODO: Failure callbacks for resource actions.
 .service('errorService', function() {
     this.reportError = function reportError(error, message) {
         if (error) {
@@ -99,8 +99,14 @@ angular.module('produce.services', [])
             });
     };
 
-    this.changePasswordModal = function changePassword(password) {
-        userService.save({ name: this.getUser().name, password: password });
+    this.changePassword = function changePassword(password) {
+        var user = this.getUser();
+        userService.changePassword({ id: user.id, pwd: password },
+            function changePasswordCallback(value) {
+                if (value) {
+                    // TODO: Report success.
+                }
+            });
     };
 
     this.logout = function logout() {
@@ -127,14 +133,14 @@ angular.module('produce.services', [])
 
             myScope.closeModal = function closeModal(save) {
                 if (save) {
-                    service.changePasswordModal(myScope.data.password);
+                    service.changePassword(myScope.data.password);
                 }
                 myScope.modal.hide();
                 myScope.data.pickedLocation = null;
             };
 
             myScope.$on('$destroy', function () {
-                $scope.modal.remove();
+                myScope.modal.remove();
             });
 
             return promise;
@@ -151,7 +157,7 @@ angular.module('produce.services', [])
      *
      * This can only happen after authentication.
      */
-    this.getLocationModal = function getLocationModal() {
+    this.getLocationModal = function getLocationModal(cancellable) {
         var service = this;
         var ionicModal = $ionicModal;
         var locService = locationService;
@@ -161,6 +167,7 @@ angular.module('produce.services', [])
             myScope.locations = locService.list();
             myScope.data = {};
             myScope.data.pickedLocation = null;
+            myScope.data.cancellable = !!cancellable;
 
             var promise = ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
                 scope: myScope
@@ -177,7 +184,7 @@ angular.module('produce.services', [])
             };
 
             myScope.$on('$destroy', function () {
-                $scope.modal.remove();
+                myScope.modal.remove();
             });
 
             return promise;
@@ -192,7 +199,12 @@ angular.module('produce.services', [])
 .service('userService', function($resource) {
     var User = $resource('/api/users/:id', { id: '@id' },
         {
-            'update': { method:'PUT' }
+            'update': { method:'PUT' },
+            'changePassword': {
+                method: 'PUT',
+                params: { id: '@id' },
+                url: '/api/users/:id/pwd'
+            }
         });
 
     this.newUser = function newUser(initial) {
@@ -228,6 +240,14 @@ angular.module('produce.services', [])
             });
         }
     };
+
+    this.changePassword = function(saveData, callback) {
+        User.changePassword({ id: saveData.id }, saveData, function changePasswordSuccess(value) {
+            if (callback) {
+                return callback(true);
+            }
+        });
+    }
 })
 
 .service('locationService', function($resource) {
@@ -380,7 +400,7 @@ angular.module('produce.services', [])
     this.addItemToCart = function addItemToCart(item) {
         // Quantity initialized to zero--may be off a scale.
         // Make a copy of the item so that it doesn't change price during the sale.
-        this.cart.push({ item: angular.extend({}, item), quantity: 0, subTotal: new Big(0)});
+        this.cart.push({ item: angular.extend({}, item), quantity: 0, subtotal: new Big(0)});
     };
 
     this.getCurrentCart = function getCurrentCart() {
@@ -409,7 +429,6 @@ angular.module('produce.services', [])
             function saveFailure(httpResponse) {
                 if (callback) {
                     // TODO: Message handling.
-                    console.log(httpResponse.data);
                     return callback(false, httpResponse.data.message || (httpResponse.data.error ? httpResponse.data.error.message : 'None'));
                 }
             });

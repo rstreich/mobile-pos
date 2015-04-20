@@ -12,6 +12,9 @@
 
     // Client-side:
     exports.wrap = function wrap(config, data) {
+        if (data.apiVersion) {  // On token refresh/retries, we hit here twice.
+            return data;
+        }
         var obj = new JsonObject(config.url);
         obj.data = data;
         return obj;
@@ -24,7 +27,6 @@
             return null;
         }
         if (responseData.apiVersion) {
-            // TODO: Add success value--maybe
             return { data: responseData.data || null, message: responseData.message || null, error: responseData.error || null };
         } else { // On token refresh/retries, we hit here twice.
             return { data: responseData };
@@ -52,10 +54,9 @@
     /**
      *
      */
-    exports.writeMessage = function writeJsonMessage(code, req, res, message, success) {
+    exports.writeMessage = function writeJsonMessage(code, req, res, message) {
         var ret = new JsonObject(req.originalUrl);
         ret.message = message;
-        ret.success = success;
         res.status(code);
         res.json(ret);
     };

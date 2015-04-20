@@ -2,9 +2,10 @@
  * 
  */
 
-var factory = require('../lib/queryFactory');
 var async = require('async');
 var Big = require('big.js');
+var factory = require('../lib/queryFactory');
+var ServerError = require('../lib/server-error');
 
 //TODO: MAYBE--Add optimistic locking.
 /* jshint laxbreak:true */
@@ -81,7 +82,7 @@ exports.insert = function insert(sale, callback) {
                     }
                     // Result can be undefined if the insert call was malformed.
                     if (!result) {
-                        return asyncCallback(new Error("Insert failed."));
+                        return asyncCallback(new ServerError(500, 'Insert failed.', null));
                     }
                     return asyncCallback(null, result.insertId);
                 })
@@ -130,7 +131,7 @@ function createDiscreteSale(inboundSale) {
     if (inboundSale.soldBy) {
         sale.soldBy = inboundSale.soldBy.id || null;
     }
-    if (!Number.isNaN(inboundSale.totalCollected)){
+    if (!Number.isNaN(Number(inboundSale.totalCollected))){
         sale.totalCollected = new Big(inboundSale.totalCollected);
     }
     return sale;
@@ -141,7 +142,7 @@ function createDiscreteSoldItem(inboundSoldItem) {
     soldItem.quantity = inboundSoldItem.quantity || null;
     if (inboundSoldItem.item) {
         soldItem.item = inboundSoldItem.item.id || null;
-        if (!Number.isNaN(inboundSoldItem.item.unitPrice)) {
+        if (!Number.isNaN(Number(inboundSoldItem.item.unitPrice))) {
             soldItem.unitPrice = new Big(inboundSoldItem.item.unitPrice);
         }
     }

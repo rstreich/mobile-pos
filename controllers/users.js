@@ -1,5 +1,6 @@
 var bcrypt = require('bcrypt');
 var userModel = require('../models/user');
+var ServerError = require('../lib/server-error');
 var protocol = require('../www/js/protocol');
 
 // Consolidating hashing code
@@ -26,54 +27,54 @@ function isInvalidPassword(pwd) {
 }
 
 //PROTECTED: Admin only
-exports.get = function getUser(req, res) {
+exports.get = function getUser(req, res, next) {
     var id = Number(req.params.id);
     if (Number.isNaN(id)) {
-        return protocol.writeError(400, req, res, 'Invalid ID: ' + req.params.id);
+        return next(new ServerError(400, 'Invalid ID: ' + req.params.id, null));
     }
     return userModel.get(id, function writeGetResult(err, results) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
         if (!results || 1 > results.length) {
-            return protocol.writeError(404, req, res, 'No user found for user ID: ' + id);
+            return next(new ServerError(404, 'No user found for user ID: ' + id, null));
         }
         return protocol.writeData(req, res, results[0]);
     });
 };
 
 //PROTECTED: Admin only
-exports.getAll = function getAllUsers(req, res) {
+exports.getAll = function getAllUsers(req, res, next) {
     return userModel.getAll(function writeGetAllResult(err, results) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
         if (!results || 1 > results.length) {
-            return protocol.writeError(404, req, res, 'No users found');
+            return next(new ServerError(404, 'No users found', null));
         }
         return protocol.writeData(req, res, results);
     }, (req.query && req.query.inactive));
 };
 
 //PROTECTED: Admin only
-exports.insert = function insertUser(req, res) {
+exports.insert = function insertUser(req, res, next) {
     // Make a pristine object
     var user = userModel.createUser(protocol.getJsonInput(req));
     // Validate input.
     if (!user) {
-        return protocol.writeError(400, req, res, 'No user provided.');
+        return next(new ServerError(400, 'No user provided.', null));
     } else if (!user.name) {
-        return protocol.writeError(400, req, res, 'No username specified.');
+        return next(new ServerError(400, 'No username specified.', null));
     } else if (!user.pwd) {
-        return protocol.writeError(400, req, res, 'Missing password.');
+        return next(new ServerError(400, 'Missing password.', null));
     }
     var message = isInvalidPassword(user.pwd);
     if (message) {
-        return protocol.writeError(400, req, res, message);
+        return next(new ServerError(400, message, null));
     }
     return hashPassword(user, userModel.insert, function userInsertCallback(err, results) {
         if (err) {
-            return protocol.writeError(500, req, res, err);
+            return next(new ServerError(500, null, err));
         }
         var newUrl = req.originalUrl + '/' + results.insertId;
         user.id = results.insertId;
@@ -83,19 +84,19 @@ exports.insert = function insertUser(req, res) {
 };
 
 //PROTECTED: Admin or self only
-exports.update = function updateUser(req, res) {
+exports.update = function updateUser(req, res, next) {
     var id = Number(req.params.id);
     if (Number.isNaN(id)) {
-        return protocol.writeError(400, req, res, 'Invalid ID: ' + req.params.id);
+        return next(new ServerError(400, 'Invalid ID: ' + req.params.id, null));
     }
     
     // Make a pristine object
     var user = userModel.createUser(protocol.getJsonInput(req));
     // Validate input.
     if (!user) {
-        return protocol.writeError(400, req, res, 'No user provided.');
+        return next(new ServerError(400, 'No user provided.', null));
     } else if (user.id !== id) {
-        return protocol.writeError(400, req, res, 'User ID in JSON(' + user.id + ') does not match specified ID: ' + id);
+        return next(new ServerError(400, 'User ID in JSON(' + user.id + ') does not match specified ID: ' + id, null));
     }
 
     var successMessage = 'User ' + id + ' updated.';
@@ -104,22 +105,26 @@ exports.update = function updateUser(req, res) {
         // Password change, so validate the password.
         var message = isInvalidPassword(user.pwd);
         if (message) {
-            return protocol.writeError(400, req, res, message);
+            return next(new ServerError(400, message, null));
         }
         return hashPassword(user, userModel.update, function updateUserPwdCallback(err, results) {
             if (err) {
-                return protocol.writeError(500, req, res, err);
+                return next(new ServerError(500, null, err));
             }
-            var success = 0 < results.affectedRows;
-            return protocol.writeMessage(success ? 201 : 400, req, res, success ? successMessage : failureMessage, success);
+            if (1 > results.affectedRows) {
+                return next(new ServerError(400, failureMessage, null));
+            }
+            return protocol.writeMessage(200, req, res, successMessage);
         });
     } else {
         userModel.update(user, function updateUserCallback(err, results) {
             if (err) {
-                return protocol.writeError(500, req, res, err);
+                return next(new ServerError(500, err, null));
             }
-            var success = 0 < results.affectedRows;
-            return protocol.writeMessage(success ? 200 : 400, req, res, success ? successMessage : failureMessage, success);
+            if (1 > results.affectedRows) {
+                return next(new ServerError(400, failureMessage, null));
+            }
+            return protocol.writeMessage(200, req, res, successMessage);
         });
     }
 };

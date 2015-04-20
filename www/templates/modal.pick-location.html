@@ -1,7 +1,7 @@
 <ion-modal-view>
     <ion-header-bar class="bar bar-header bar-positive">
         <h1 class="title">Please select a location</h1>
-        <div class="buttons">
+        <div ng-show="data.cancellable" class="buttons">
             <button class="button button-clear" ng-click="closeModal(false)">Cancel</button>
         </div>
     </ion-header-bar>
