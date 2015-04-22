@@ -14,5 +14,8 @@ bower_components
 \#*\#
 lib/dbconfig.js
 etc/createuser.sql
+bootstrap.js
 *.pem
 *.ppk
+
+npm-debug.log

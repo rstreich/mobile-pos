@@ -4,8 +4,8 @@ var favicons = require('connect-favicons');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var bunyan = require('bunyan');
-var ServerError = require('./lib/server-error');
 
+var ServerError = require('./lib/server-error');
 var protocol = require('./www/js/protocol.js');
 var auth2 = require('./controllers/auth');
 
