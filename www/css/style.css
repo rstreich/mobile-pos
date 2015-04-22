@@ -279,7 +279,6 @@ select {
     font-size: 1em;
 }
 
-/* TODO: Get these aligned better */
 .edit-info, .form-error, .required-hint {
     font-size: .8em;
     margin-left: 1em;

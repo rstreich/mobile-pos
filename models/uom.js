@@ -1,7 +1,5 @@
 var factory = require('../lib/queryFactory');
 
-//TODO: MAYBE--Add optimistic locking.
-
 /**
  * All the properties on UnitsOfMeasure objects
  * @const

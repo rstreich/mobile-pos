@@ -7,7 +7,6 @@ var Big = require('big.js');
 var factory = require('../lib/queryFactory');
 var ServerError = require('../lib/server-error');
 
-//TODO: MAYBE--Add optimistic locking.
 /* jshint laxbreak:true */
 var baseSelect = 'SELECT Sales.id AS saleId,'
     +  ' Sales.saleDate AS saleDate,'

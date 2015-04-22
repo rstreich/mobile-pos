@@ -8,7 +8,7 @@ angular.module('produce.controllers', [])
     $scope.loginData = { username: null, password: null };
 
     $scope.login = function login() {
-        // TODO: Real login and failure handling.
+        // TODO: failure handling.
         authService.login($scope.loginData.username, $scope.loginData.password, function(err) {
             if (err) {
                 return console.log(err.message);

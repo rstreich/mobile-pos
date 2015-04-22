@@ -4,8 +4,6 @@
 
 var factory = require('../lib/queryFactory');
 
-//TODO: MAYBE--Add optimistic locking.
-
 /* jshint laxbreak:true */
 var baseSelect = 'SELECT Items.id AS id,'
     +  ' Items.name AS name,'

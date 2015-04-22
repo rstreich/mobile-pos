@@ -171,7 +171,6 @@ angular.module('produce.services', [])
 
             var promise = ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
                 scope: myScope
-                //animation: 'slide-in-up'
             }).then(function (modal) {
                 myScope.modal = modal;
                 return modal;
