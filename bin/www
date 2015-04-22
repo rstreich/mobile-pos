@@ -10,9 +10,9 @@ var path = require('path');
 /**
  * Get port from environment and store in Express.
  */
-var port = normalizePort(process.env.HTTPS_PORT || '443');
+var port = normalizePort(process.env.HTTPS_PORT || '3000');
 app.set('port', port);
-var httpPort = normalizePort(process.env.HTTP_PORT || '80');
+var httpPort = normalizePort(process.env.HTTP_PORT || '8000');
 
 var rootDir = path.join(__dirname, '..');
 var certDir = path.join(rootDir, 'etc');
