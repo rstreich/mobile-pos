@@ -31,7 +31,9 @@ angular.module('produce.services', [])
     };
 
     this.setCurrentLocation = function setCurrentLocation(location) {
-        return $window.sessionStorage.location = angular.toJson(location);
+        if (location) {
+            return $window.sessionStorage.location = angular.toJson(location);
+        }
     };
 
     this.getToken = function getToken() {
@@ -166,11 +168,22 @@ angular.module('produce.services', [])
             var myScope = $scope.$new(false, $scope);
             myScope.locations = locService.list();
             myScope.data = {};
-            myScope.data.pickedLocation = null;
+            var current = service.getCurrentLocation();
+            if (current) {
+                myScope.locations.$promise.then(function findCurrent() {
+                    for (var i = 0; i < myScope.locations.length; ++i) {
+                        if (myScope.locations[i].id == current.id) {
+                            myScope.data.pickedLocation = myScope.locations[i];
+                        }
+                    }
+                });
+            }
             myScope.data.cancellable = !!cancellable;
 
             var promise = ionicModal.fromTemplateUrl('templates/modal.pick-location.html', {
-                scope: myScope
+                scope: myScope,
+                backdropClickToClose: !!cancellable,
+                hardwareBackButtonClose: !!cancellable
             }).then(function (modal) {
                 myScope.modal = modal;
                 return modal;
@@ -179,7 +192,6 @@ angular.module('produce.services', [])
             myScope.closeModal = function closeModal() {
                 service.setCurrentLocation(myScope.data.pickedLocation);
                 myScope.modal.hide();
-                myScope.data.pickedLocation = null;
             };
 
             myScope.$on('$destroy', function () {

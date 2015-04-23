@@ -1,5 +1,6 @@
 <ion-view view-title="Catalog">
   <ion-content>
+      <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
       <div class="catalog-box">
           <div ng-repeat="item in items" class="catalog-item card">
               <img class="catalog-item-img" ng-src="/img/items/{{item.image}}">

@@ -89,6 +89,14 @@ angular.module('produce.controllers', [])
     $scope.uoms = uomService.list();
     $scope.items = itemService.list($scope.includeInactive);
 
+    $scope.doRefresh = function doRefresh() {
+        $scope.uoms = uomService.list();
+        $scope.items = itemService.list($scope.includeInactive);
+        $scope.items.$promise.finally(function() {
+            $scope.$broadcast('scroll.refreshComplete');
+        });
+    };
+
     /*
      * Edit item modal
      */
@@ -160,6 +168,13 @@ angular.module('produce.controllers', [])
     $scope.includeInactive = true;
     $scope.users = userService.list($scope.includeInactive);
 
+    $scope.doRefresh = function doRefresh() {
+        $scope.users = userService.list($scope.includeInactive);
+        $scope.users.$promise.finally(function() {
+            $scope.$broadcast('scroll.refreshComplete');
+        });
+    };
+
     /*
      * Edit user modal
      */
@@ -210,6 +225,13 @@ angular.module('produce.controllers', [])
 .controller('LocationsController', function($scope, $state, $ionicModal, locationService) {
     $scope.locations = locationService.list();
 
+    $scope.doRefresh = function doRefresh() {
+        $scope.locations = locationService.list();
+        $scope.locations.$promise.finally(function() {
+            $scope.$broadcast('scroll.refreshComplete');
+        });
+    };
+
     /*
      * Edit location modal
      */
@@ -258,6 +280,13 @@ angular.module('produce.controllers', [])
 .controller('UomsController', function($scope, $ionicModal, uomService) {
     $scope.uoms = uomService.list();
 
+    $scope.doRefresh = function doRefresh() {
+        $scope.uoms = uomService.list();
+        $scope.uoms.$promise.finally(function() {
+            $scope.$broadcast('scroll.refreshComplete');
+        });
+    };
+
     /*
      * Edit uom modal
      */
@@ -305,6 +334,13 @@ angular.module('produce.controllers', [])
  */
 .controller('CatalogController', function($scope, itemService) {
     $scope.items = itemService.list();
+
+    $scope.doRefresh = function doRefresh() {
+        $scope.items = itemService.list();
+        $scope.items.$promise.finally(function() {
+            $scope.$broadcast('scroll.refreshComplete');
+        });
+    }
 })
 
 /*

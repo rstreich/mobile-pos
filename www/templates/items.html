@@ -6,6 +6,7 @@
         <button class="button button-clear icon ion-plus" ng-click="showEditItem()"></button>
     </ion-nav-buttons>
     <ion-content>
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
         <div class="catalog-box">
             <div ng-repeat="item in items" class="admin-catalog-item card">
                 <div class="admin-catalog-item-hdr">

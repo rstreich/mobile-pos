@@ -7,7 +7,14 @@
     </ion-header-bar>
     <ion-content class="padding">
         <form name="pickLocationForm" class="css-form" novalidate>
-            <select ng-options="location.name for location in locations track by location.id" required ng-model="data.pickedLocation"></select>
+            <!-- select ng-options="location.name for location in locations track by location.id" required ng-model="data.pickedLocation"></select -->
+            <label class="item item-radio" ng-repeat="location in locations">
+                <input type="radio" name="location" ng-model="data.pickedLocation" ng-value="location">
+                <div class="item-content">
+                    {{location.name}}
+                </div>
+                <i class="radio-icon ion-checkmark"></i>
+            </label>
             <button ng-disabled="pickLocationForm.$invalid" class="button button-block button-positive" ng-click="closeModal(true)">Select Location</button>
         </form>
     </ion-content>

@@ -70,8 +70,8 @@ INSERT INTO UnitsOfMeasure(id, name) VALUES
  (4, 'quart'),
  (5, 'pint');
 INSERT INTO Items(id, name, uom, unitPrice, image) VALUES
- (1, 'Discounted Amount', 1, -1, 'discount.png'),
- (2, 'Donated Amount', 1, 1, 'donation.png');
+ (1, 'Discount', 1, -1, 'discount.png'),
+ (2, 'Donation', 1, 1, 'donation.png');
 
 -- play data
 INSERT INTO Users(name, pwd) VALUES ('Fooble', password('feeble'));
