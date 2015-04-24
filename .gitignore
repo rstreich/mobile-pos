@@ -2,6 +2,7 @@
 # http://git-scm.com/docs/gitignore
 platforms/
 plugins/
+www/lib
 dist
 .tmp
 .sass-cache
