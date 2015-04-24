@@ -12,14 +12,14 @@
                 <tr>
                     <th>Name:</th>
                     <td>
-                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="formData.editItem.name">
+                        $<input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="formData.editItem.name">
                         <span ng-show="itemForm.name.$error.required" class="required-hint"></span>
                     </td>
                 </tr>
                 <tr>
                     <th>Unit Price:</th>
                     <td>
-                        <div dollar-input name="unitPrice" required ng-model="formData.editItem.unitPrice"></div>
+                        <input dollar-input name="unitPrice" required ng-model="formData.editItem.unitPrice">
                         <span ng-show="itemForm.unitPrice.$error.required" class="required-hint"></span>
                         <span ng-show="itemForm.unitPrice.$error.pattern" class="form-error">Numbers only.</span>
                     </td>

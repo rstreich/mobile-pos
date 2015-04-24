@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var bunyan = require('bunyan');
 
 var ServerError = require('./lib/server-error');
+var addHeaders = require('./lib/headers');
 var protocol = require('./www/js/protocol.js');
 var auth2 = require('./controllers/auth');
 
@@ -37,6 +38,7 @@ app.set('view engine', 'jade');
 app.use(favicons(path.join(imageRoot, 'icons')));
 app.use(logger('dev'));
 
+app.use('/api', auth2.verifyAuthenticated);
 app.use(express.static(clientRoot));
 
 app.use('/api', auth2.verifyAuthenticated);

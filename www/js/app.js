@@ -69,7 +69,6 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
     };
 })
 
-// TODO: Replace contenteditable with input.
 .directive('dollarInput', function() {
     return {
         restrict: 'A',
@@ -83,19 +82,7 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
             var validPattern = /^(\d*)(\.(\d{1,2})?)?$/;
             var required = scope.hasOwnProperty('required');
 
-            modelController.$render = function() {
-                if (modelController.$viewValue) {
-                    element.html(modelController.$viewValue);
-                }
-            };
-
-            element.attr('contenteditable', true);
-
-            element.on('input', function() {
-                scope.$apply(function() {
-                    modelController.$setViewValue(element.html());
-                });
-            });
+            element.attr('pattern', validPattern);
 
             function bigFormatter(modelValue) {
                 if (!modelValue) {
@@ -108,7 +95,6 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
                 modelController.$setValidity('big', true);
                 return modelValue.toFixed(2);
             }
-
             modelController.$formatters.push(bigFormatter);
 
             function bigParser(domValue) {
