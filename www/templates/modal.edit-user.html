@@ -13,8 +13,11 @@
                 <tr>
                     <th>Name:</th>
                     <td colspan="3">
-                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="formData.editUser.name">
+                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required pattern="^[\w\.]*$"
+                               ng-model="formData.editUser.name" ng-change="clearUsernameExists()" ng-blur="usernameExists(formData.editUser.name)">
                         <span class="required-hint" ng-show="userForm.name.$error.required"></span>
+                        <span class="form-error" ng-show="userForm.name.$error.nameExists">That name is already in use.</span>
+                        <span class="form-error" ng-show="userForm.name.$error.pattern">Only letters and '.'</span>
                     </td>
                 </tr>
                 <tr>

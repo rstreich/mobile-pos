@@ -3,12 +3,13 @@ var router = express.Router();
 var items = require('../controllers/items');
 var auth = require('../controllers/auth');
 
-var root = router.route('/');
-root.get(items.getAll); // Catalog view
-root.post(auth.verifyAdmin, items.insert); // Admin only
+router.route('/')
+.get(items.getAll) // Catalog view
+.post(auth.verifyAdmin, items.insert); // Admin only
 
-var specifiedItem = router.route('/:id');
-specifiedItem.get(items.get);
-specifiedItem.put(auth.verifyAdmin, items.update); // Admin only
+router.route('/:id')
+.get(items.get)
+.head(auth.verifyAdmin, items.exists) // Admin only
+.put(auth.verifyAdmin, items.update); // Admin only
 
 module.exports = router;

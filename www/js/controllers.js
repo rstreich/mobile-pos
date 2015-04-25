@@ -109,6 +109,23 @@ angular.module('produce.controllers', [])
         $scope.editItemModal = modal;
     });
 
+    function setNameValidity(valid) {
+        $scope.formData.form.name.$setValidity('nameExists', valid);
+    }
+
+    $scope.itemNameExists = function itemNameExists(name) {
+        if (name) {
+            return itemService.exists(name, function(exists) {
+                setNameValidity(!exists);
+            });
+        }
+        return setNameValidity(true)
+    };
+
+    $scope.clearItemNameExists = function clearItemNameExists() {
+        return setNameValidity(true);
+    };
+
     $scope.closeEditItem = function closeEditItem() {
         $scope.editItemModal.hide();
         $scope.formData.form.$setPristine();
@@ -195,9 +212,27 @@ angular.module('produce.controllers', [])
     $scope.showEditUser = function showEditUser(user) {
         $scope.formData.add = !user;
         $scope.formData.pwdRequired = !user;
+        $scope.formData.usernameExists = false;
         $scope.formData.origUser = user || userService.newUser({ id: null, name: '', pwd: '', isActive: true, isAdmin: false });
         $scope.formData.editUser = angular.extend({}, $scope.formData.origUser);
         $scope.editUserModal.show();
+    };
+
+    function setNameValidity(valid) {
+        $scope.formData.form.name.$setValidity('nameExists', valid);
+    }
+
+    $scope.usernameExists = function usernameExists(name) {
+        if (name) {
+            return userService.exists(name, function(exists) {
+                setNameValidity(!exists);
+            });
+        }
+        return setNameValidity(true)
+    };
+
+    $scope.clearUsernameExists = function clearUsernameExists() {
+        return setNameValidity(true);
     };
 
     function userNameCompare(left, right) {
@@ -222,7 +257,7 @@ angular.module('produce.controllers', [])
 /*
  * Admin-only section--Location management.
  */
-.controller('LocationsController', function($scope, $state, $ionicModal, locationService) {
+.controller('LocationsController', function($scope, $ionicModal, locationService) {
     $scope.locations = locationService.list();
 
     $scope.doRefresh = function doRefresh() {
@@ -242,6 +277,23 @@ angular.module('produce.controllers', [])
     }).then(function setLocationModal(modal) {
         $scope.editLocationModal = modal;
     });
+
+    function setNameValidity(valid) {
+        $scope.formData.form.name.$setValidity('nameExists', valid);
+    }
+
+    $scope.locationNameExists = function locationNameExists(name) {
+        if (name) {
+            return locationService.exists(name, function(exists) {
+                setNameValidity(!exists);
+            });
+        }
+        return setNameValidity(true)
+    };
+
+    $scope.clearLocationNameExists = function clearLocationNameExists() {
+        return setNameValidity(true);
+    };
 
     $scope.closeEditLocation = function closeEditLocation() {
         $scope.editLocationModal.hide();
@@ -297,6 +349,23 @@ angular.module('produce.controllers', [])
     }).then(function setUomModal(modal) {
         $scope.editUomModal = modal;
     });
+
+    function setNameValidity(valid) {
+        $scope.formData.form.name.$setValidity('nameExists', valid);
+    }
+
+    $scope.uomNameExists = function uomNameExists(name) {
+        if (name) {
+            return uomService.exists(name, function(exists) {
+                setNameValidity(!exists);
+            });
+        }
+        return setNameValidity(true)
+    };
+
+    $scope.clearUomNameExists = function clearUomNameExists() {
+        return setNameValidity(true);
+    };
 
     $scope.closeEditUom = function closeEditUom() {
         $scope.editUomModal.hide();

@@ -79,3 +79,18 @@ exports.update = function updateUnitOfMeasure(req, res, next) {
         return protocol.writeMessage(success ? 200 : 400, req, res, success ? 'Unit of measure ' + id + ' updated.' : 'Failed to update unit of measure: ' + id, success);
     });
 };
+
+//PROTECTED: Admin only
+exports.exists = function exists(req, res, next) {
+    // Not really id in this case.
+    var name = req.params.id;
+    return uomModel.exists(name, function exists(err, results) {
+        if (err) {
+            return next(new ServerError(500, null, err));
+        }
+        if (!results || 1 > results.length) {
+            return res.sendStatus(404);
+        }
+        return res.sendStatus(204);
+    });
+};

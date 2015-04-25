@@ -43,6 +43,7 @@ var tableName = 'Items';
 var getQuery = factory.makeSimpleGet(baseSelect + ' where ?');
 var getAllQuery = factory.makeSimpleGetAll(baseSelect + orderBy);
 var getAllActiveQuery = factory.makeSimpleGetAll(baseSelect + ' WHERE isActive > 0' + orderBy);
+var existsQuery = factory.makeSimpleGet('SELECT name from ' + tableName + ' WHERE ? LIMIT 1');
 var insertQuery = factory.makeSimpleInsert('INSERT INTO ' + tableName + ' SET ?');
 var updateQuery = factory.makeSimpleUpdate('UPDATE ' + tableName + ' SET ? WHERE ?');
 var deleteAllQuery = factory.makeDeleteAll(tableName);
@@ -92,6 +93,10 @@ exports.getAll = function getAll(callback, includeInactive) {
         return getAllQuery(getHandler);
     }
     return getAllActiveQuery(getHandler);
+};
+
+exports.exists = function exists(name, callback) {
+    return existsQuery({ name: name }, callback);
 };
 
 // PROTECTED: Admin only

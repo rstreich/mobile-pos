@@ -12,14 +12,16 @@
                 <tr>
                     <th>Name:</th>
                     <td>
-                        $<input id="edit-text" name="name" size="20" maxlength="20" type="text" required ng-model="formData.editItem.name">
+                        <input id="edit-text" name="name" size="20" maxlength="20" type="text" required
+                               ng-blur="itemNameExists(formData.editItem.name)" ng-change="clearItemNameExists()" ng-model="formData.editItem.name">
+                        <span class="form-error" ng-show="itemForm.name.$error.nameExists">That name is already in use.</span>
                         <span ng-show="itemForm.name.$error.required" class="required-hint"></span>
                     </td>
                 </tr>
                 <tr>
                     <th>Unit Price:</th>
                     <td>
-                        <input dollar-input name="unitPrice" required ng-model="formData.editItem.unitPrice">
+                        $<input dollar-input name="unitPrice" required ng-model="formData.editItem.unitPrice">
                         <span ng-show="itemForm.unitPrice.$error.required" class="required-hint"></span>
                         <span ng-show="itemForm.unitPrice.$error.pattern" class="form-error">Numbers only.</span>
                     </td>

@@ -81,3 +81,18 @@ exports.update = function updateLocation(req, res, next) {
         return protocol.writeMessage(200, req, res, 'Location ' + id + ' updated.');
     });
 };
+
+//PROTECTED: Admin only
+exports.exists = function exists(req, res, next) {
+    // Not really id in this case.
+    var name = req.params.id;
+    return locationModel.exists(name, function exists(err, results) {
+        if (err) {
+            return next(new ServerError(500, null, err));
+        }
+        if (!results || 1 > results.length) {
+            return res.sendStatus(404);
+        }
+        return res.sendStatus(204);
+    });
+};

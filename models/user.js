@@ -29,7 +29,7 @@ var tableName = 'Users';
 
 var orderBy = ' ORDER BY name';
 
-var existsQuery = factory.makeSimpleGet('SELECT name from ' + tableName + ' FORCE INDEX WHERE ? LIMIT 1');
+var existsQuery = factory.makeSimpleGet('SELECT name from ' + tableName + ' WHERE ? LIMIT 1');
 var getQuery = factory.makeSimpleGet('SELECT ' + fields + ' from ' + tableName + ' WHERE ?');
 var getWithPasswordQuery = factory.makeSimpleGet('SELECT ' + allFields + ' from ' + tableName + ' where ? AND isActive > 0');
 var getAllQuery = factory.makeSimpleGetAll('SELECT ' + fields + ' from ' + tableName + orderBy);

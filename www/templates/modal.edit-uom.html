@@ -13,7 +13,9 @@
                 <tr>
                     <th>Name:</th>
                     <td>
-                        <input id="edit-text" size="20" maxlength="20" type="text" required ng-model="formData.editUom.name">
+                        <input name="name" id="edit-text" size="20" maxlength="20" type="text" required
+                               ng-blur="uomNameExists(formData.editUom.name)" ng-change="clearUomNameExists()" ng-model="formData.editUom.name">
+                        <span class="form-error" ng-show="uomForm.name.$error.nameExists">That name is already in use.</span>
                     </td>
                 </tr>
             </table>

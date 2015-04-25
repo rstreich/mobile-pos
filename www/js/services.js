@@ -207,7 +207,7 @@ angular.module('produce.services', [])
     };
 })
 
-.service('userService', function($resource) {
+.service('userService', function($resource, $http) {
     var User = $resource('/api/users/:id', { id: '@id' },
         {
             'update': { method:'PUT' },
@@ -220,6 +220,16 @@ angular.module('produce.services', [])
 
     this.newUser = function newUser(initial) {
         return new User(initial);
+    };
+
+    this.exists = function exists(name, callback) {
+        return $http.head('/api/users/' + name)
+            .success(function existsSuccess() {
+                return callback(true);
+            })
+            .error(function existsFailure() {
+                return callback(false);
+            });
     };
 
     this.list = function list(includeInactive) {
@@ -261,7 +271,7 @@ angular.module('produce.services', [])
     }
 })
 
-.service('locationService', function($resource) {
+.service('locationService', function($resource, $http) {
     var Location = $resource('/api/locations/:id', { id: '@id' },
         {
             'update': { method:'PUT' }
@@ -300,9 +310,19 @@ angular.module('produce.services', [])
             });
         }
     };
+
+    this.exists = function exists(name, callback) {
+        return $http.head('/api/locations/' + name)
+            .success(function existsSuccess() {
+                return callback(true);
+            })
+            .error(function existsError() {
+                return callback(false);
+            });
+    };
 })
 
-.service('uomService', function($resource) {
+.service('uomService', function($resource, $http) {
     var Uom = $resource('/api/uoms/:id', { id: '@id' },
         {
             'update': { method:'PUT' }
@@ -337,6 +357,16 @@ angular.module('produce.services', [])
                 }
             });
         }
+    };
+
+    this.exists = function exists(name, callback) {
+        return $http.head('/api/uoms/' + name)
+            .success(function existsSuccess() {
+                return callback(true);
+            })
+            .error(function existsError() {
+                return callback(false);
+            });
     };
 })
 
@@ -400,7 +430,17 @@ angular.module('produce.services', [])
                 }
             });
         }
-    }
+    };
+
+    this.exists = function exists(name, callback) {
+        return $http.head('/api/items/' + name)
+            .success(function existsSuccess() {
+                return callback(true);
+            })
+            .error(function existsError() {
+                return callback(false);
+            });
+    };
 })
 
 .service('cartService', function($resource) {
