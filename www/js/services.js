@@ -564,6 +564,20 @@ angular.module('produce.services', [])
     };
 })
 
+.service('reportService', function($http) {
+    this.query = function(by, fromDate, toDate) {
+        var config = {
+            headers: { Accept: 'application/json' },
+            params: {
+                by: by,
+                fromDate: fromDate.getTime(),
+                toDate: toDate.getTime()
+            }
+        };
+        return $http.get('/api/sales', config);
+    }
+})
+
 .service('retryService', function($q, $injector) {
     var pending = [];
     var refreshing = false;

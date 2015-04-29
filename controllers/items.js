@@ -3,7 +3,7 @@
  */
 
 var itemModel = require('../models/item');
-var ServerError = require('../lib/server-error');
+var ServerError = require('../lib/errors').ServerError;
 var protocol = require('../www/js/protocol');
 
 exports.get = function getItem(req, res, next) {

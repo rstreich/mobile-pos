@@ -29,7 +29,7 @@ CREATE TABLE Items (
  isActive BOOLEAN NOT NULL DEFAULT 1,
  image VARCHAR(80) NOT NULL DEFAULT 'no-image.png',
  UNIQUE INDEX(name),
- constraint fk_uom
+ CONSTRAINT fk_uom
   FOREIGN KEY (uom) REFERENCES UnitsOfMeasure(id)
 );
 
@@ -45,9 +45,10 @@ CREATE TABLE Sales (
  totalCollected DECIMAL(10, 2) NOT NULL,
  location INTEGER NOT NULL,
  soldBy INTEGER NOT NULL,
- constraint fk_users
+ INDEX dataIndex(saleDate),
+ CONSTRAINT fk_users
   FOREIGN KEY (soldBy) REFERENCES Users(id),
- constraint fk_location
+ CONSTRAINT fk_location
   FOREIGN KEY (location) REFERENCES Locations(id)
 );
 
@@ -56,9 +57,9 @@ CREATE TABLE SoldItems (
  unitPrice DECIMAL(10, 2) NOT NULL,
  item INTEGER NOT NULL,
  sale INTEGER NOT NULL,
- constraint fk_item
+ CONSTRAINT fk_item
   FOREIGN KEY (item) REFERENCES Items(id),
- constraint fk_sale
+ CONSTRAINT fk_sale
   FOREIGN KEY (sale) REFERENCES Sales(id)
 );
 

@@ -208,6 +208,46 @@ angular.module('produce', ['ionic', 'produce.controllers', 'produce.services', '
         }
     })
 
+    .state('app.admin.reports', {
+        url: "/reports",
+        views: {
+            'tab-admin@app': {
+                templateUrl: "templates/reports.html",
+                controller: 'ReportsController'
+            }
+        }
+    })
+
+    .state('app.admin.reports.report1', {
+        url: "",
+        views: {
+            'report': {
+                templateUrl: "part.single-group-report.html",
+                controller: 'ReportController'
+            }
+        }
+    })
+
+    .state('app.admin.reports.report2', {
+        url: "",
+        views: {
+            'report': {
+                templateUrl: "part.dual-group-report.html",
+                controller: 'ReportController'
+            }
+        }
+    })
+
+    .state('app.admin.reports.error', {
+        url: "",
+        views: {
+            'report': {
+                templateUrl: "part.error-report.html",
+                controller: 'ReportController'
+            }
+        }
+    })
+
     .state('app.catalog', {
         url: "/catalog",
         views: {

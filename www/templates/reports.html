@@ -1,0 +1,69 @@
+<ion-view view-title="Sales Reports">
+    <ion-nav-buttons side="left">
+        <button class="button button-clear icon ion-ios-arrow-back" ng-click="goHere('app.admin')">Administration</button>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <div class="list">
+            <div class="item-divider">
+                Quick Reports
+            </div>
+            <div class="item item-button-right">
+                Today's sales by location
+                <button class="button button-stable" ng-click="queryByLocationForToday()">Get</button>
+            </div>
+            <div class="item item-button-right">
+                Monthly sales report for&nbsp;
+                <label class="date-label"><input type="month" ng-model="data.selectedMonth" min="{{getAbsoluteMinDate()}}" max="{{getMaxDate()}}" required></label>
+                <button ng-disabled="!data.selectedMonth" class="button button-stable" ng-click="queryByLocationForMonth()">Get</button>
+            </div>
+            <div class="item-divider">
+                Other Reports
+            </div>
+            <div class="item item-button-right">
+                Sales by location from
+                <label class="date-label"><input type="date" ng-model="data.loc.fromDate" min="{{getAbsoluteMinDate(true)}}" max="{{getMaxDate(true)}}" required></label> to
+                <label class="date-label"><input type="date" ng-model="data.loc.toDate" min="{{getDateString(data.loc.fromDate, true)}}" max="{{getMaxDate(true)}}" required></label>
+                <button ng-disabled="!data.loc.fromDate || !data.loc.toDate" class="button button-stable" ng-click="queryByLocationForPeriod()">Get</button>
+            </div>
+            <div class="item item-button-right">
+                Item quantities from
+                <label class="date-label"><input type="date" ng-model="data.item.fromDate" min="{{getAbsoluteMinDate(true)}}" max="{{getMaxDate(true)}}" required></label> to
+                <label class="date-label"><input type="date" ng-model="data.item.toDate" min="{{getDateString(data.item.fromDate, true)}}" max="{{getMaxDate(true)}}" required></label>
+                <button ng-disabled="!data.item.fromDate || !data.item.toDate" class="button button-stable" ng-click="queryByItemsForPeriod()">Get</button>
+            </div>
+            <div class="item item-button-right">
+                Item quantities by location from
+                <label class="date-label"><input type="date" ng-model="data.itemLoc.fromDate" min="{{getAbsoluteMinDate(true)}}" max="{{getMaxDate(true)}}" required></label> to
+                <label class="date-label"><input type="date" ng-model="data.itemLoc.toDate" min="{{getDateString(data.itemLoc.fromDate, true)}}" max="{{getMaxDate(true)}}" required></label>
+                <button ng-disabled="!data.itemLoc.fromDate || !data.itemLoc.toDate" class="button button-stable" ng-click="queryItemsByLocationForPeriod()">Get</button>
+            </div>
+        </div>
+
+        <div ui-view name="report"></div>
+
+        <script id="part.single-group-report.html" type="text/ng-template">
+            <table class="report-table">
+                <thead><tr><th ng-class="{ datacol: !$first }" ng-repeat="header in data.report.headers track by $index">{{header}}</th></tr></thead>
+                <tbody>
+                    <tr ng-repeat="row in data.report.table track by $index">
+                        <td ng-class="{ datacol: !$first }" ng-repeat="column in row track by $index">{{column}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </script>
+        <script id="part.dual-group-report.html" type="text/ng-template">
+            <table class="report-table">
+                <thead><tr><th ng-class="{ datacol: $index > 1 }" ng-repeat="header in data.report.headers track by $index">{{header}}</th></tr></thead>
+                <tbody ng-repeat="block in data.report.table track by $index">
+                    <tr ng-repeat="row in block.rows track by $index">
+                        <td ng-if="$first" rowspan="{{block.rows.length}}">{{block.col1}}</td>
+                        <td ng-class="{ datacol: !$first }" ng-repeat="column in row track by $index">{{column}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </script>
+        <script id="part.error-report.html" type="text/ng-template">
+        {{data.error}}
+        </script>
+    </ion-content>
+</ion-view>

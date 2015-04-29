@@ -1,6 +1,6 @@
 var bcrypt = require('bcrypt');
 var userModel = require('../models/user');
-var ServerError = require('../lib/server-error');
+var ServerError = require('../lib/errors').ServerError;
 var protocol = require('../www/js/protocol');
 
 // Consolidating hashing code

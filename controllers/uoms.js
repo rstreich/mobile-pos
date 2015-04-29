@@ -1,5 +1,5 @@
 var uomModel = require('../models/uom');
-var ServerError = require('../lib/server-error');
+var ServerError = require('../lib/errors').ServerError;
 var protocol = require('../www/js/protocol');
 
 //PROTECTED: Admin only

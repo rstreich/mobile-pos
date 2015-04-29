@@ -436,6 +436,19 @@ input[dollar-input] {
     text-align: right;
 }
 
+input[type=date], input[type=month] {
+    display: inline-block;
+    border: 1px solid lightgray;
+    text-align: center;
+    font-size: 100%;
+    margin-bottom: inherit;
+    padding-bottom: inherit;
+}
+
+input::-webkit-inner-spin-button {
+    display: none;
+}
+
 input#edit-text {
     padding: 6px 12px;
     color: #555555;
@@ -466,6 +479,11 @@ input#edit-text {
 
 input#edit-text.ng-invalid.ng-dirty, input[dollar-input].ng-invalid.ng-dirty {
     background-color: #FA787E;
+}
+
+.date-label {
+    /*padding-bottom: 5px;*/
+    margin-bottom: 5px;
 }
 
 /*
@@ -534,4 +552,39 @@ div.keypad-total {
     border: 1px solid lightgray;
     border-radius: .25em;
     -webkit-border-radius: .25em;
+}
+
+/*
+ * Reports
+ */
+table.report-table {
+    width: 100%;
+    border: 1px solid lightgray;
+}
+
+table.report-table tr {
+    border-bottom: 1px solid lightgray;
+}
+
+table.report-table tr.unruled {
+    border-bottom: none;
+}
+
+table.report-table th, table.report-table td {
+    vertical-align: middle;
+    padding: 5px;
+    height: 2em;
+    text-align: left;
+}
+
+table.report-table th {
+    font-weight: bold;
+}
+
+table.report-table td {
+    padding: .5em;
+}
+
+table.report-table td.datacol, table.report-table th.datacol {
+    text-align: right;
 }

@@ -5,7 +5,8 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var bunyan = require('bunyan');
 
-var ServerError = require('./lib/server-error');
+var ServerError = require('./lib/errors').ServerError;
+var NotFoundError = require('./lib/errors').NotFoundError;
 var addHeaders = require('./lib/headers');
 var protocol = require('./www/js/protocol.js');
 var auth2 = require('./controllers/auth');
@@ -62,13 +63,13 @@ app.use('/api/sales', sales);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new ServerError(404, 'Not Found', null);
+  var err = new NotFoundError('Not Found');
   next(err);
 });
 
 // error handlers
 app.use(function jsonErrorHandler(err, req, res, next) {
-    if (err.status === 404) {
+    if (!(err instanceof ServerError)) {
         return next(err);
     }
     log.error({ req: req, err: err });

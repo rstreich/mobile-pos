@@ -714,4 +714,93 @@ angular.module('produce.controllers', [])
                 modal.show();
             });
     };
+})
+
+.controller('ReportsController', function($scope, $state, reportService) {
+    var absoluteMinDate = new Date(2015, 3);
+
+    $scope.data = {};
+
+    // Set default to previous month
+    var currentDate = new Date();
+    $scope.data.selectedMonth = new Date(currentDate.getFullYear(), (currentDate.getMonth() + 11) % 12);
+
+    $scope.data.loc = {};
+    $scope.data.loc.fromDate = new Date(absoluteMinDate.getTime());
+    $scope.data.loc.toDate = new Date();
+
+    $scope.data.item = {};
+    $scope.data.item.fromDate = new Date(absoluteMinDate.getTime());
+    $scope.data.item.toDate = new Date();
+
+    $scope.data.itemLoc = {};
+    $scope.data.itemLoc.fromDate = new Date(absoluteMinDate.getTime());
+    $scope.data.itemLoc.toDate = new Date();
+
+    $scope.getAbsoluteMinDate = function getMinDate(includeDay) {
+        return $scope.getDateString(absoluteMinDate, includeDay);
+    };
+
+    $scope.getMaxDate = function getMaxDate(includeDay) {
+        var today = new Date();
+        return $scope.getDateString(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1), includeDay);
+    };
+
+    $scope.getDateString = function getDateString(date, includeDay) {
+        if (!date) {
+            date = absoluteMinDate;
+        }
+        var month = date.getMonth() + 1;
+        var monthDate = date.getDate();
+        var dateString = '' + date.getFullYear() + '-' + (month < 10 ? '0' : '') + month;
+        if (includeDay) {
+            dateString = dateString + '-' + (monthDate < 10 ? '0' : '') + monthDate;
+        }
+        return dateString;
+    };
+
+    function querySuccess(data, status, headers, config) {
+        $scope.data.report = data;
+        $state.go('app.admin.reports.report' + data.axes);
+    }
+
+    function queryError(data, status, headers, config) {
+        $scope.data.error = data.error.message;
+        $state.go('app.admin.reports.error');
+    }
+
+    $scope.queryByLocationForToday = function queryByLocationForToday() {
+        var today = new Date();
+        var fromDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var toDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1); // Midnight
+        reportService.query('Location', fromDate, toDate).success(querySuccess).error(queryError);
+    };
+
+    $scope.queryByLocationForMonth = function queryByLocationForMonth() {
+        // Midnight, first day of the following month.
+        var toDate = new Date($scope.data.selectedMonth.getFullYear(), $scope.data.selectedMonth.getMonth() + 1);
+        reportService.query('Location', $scope.data.selectedMonth, toDate).success(querySuccess).error(queryError);
+    };
+
+    $scope.queryByLocationForPeriod = function queryByLocationForPeriod() {
+        // Add 1 day to the 'toDate' to make the date inclusive
+        var toDate = new Date($scope.data.loc.toDate.getFullYear(), $scope.data.loc.toDate.getMonth(), $scope.data.loc.toDate.getDate() + 1);
+        reportService.query('Location', $scope.data.loc.fromDate, toDate).success(querySuccess).error(queryError);
+    };
+
+    $scope.queryByItemsForPeriod = function queryByItemsForPeriod() {
+        // Add 1 day to the 'toDate' to make the date inclusive
+        var toDate = new Date($scope.data.item.toDate.getFullYear(), $scope.data.item.toDate.getMonth(), $scope.data.item.toDate.getDate() + 1);
+        reportService.query('Item', $scope.data.item.fromDate, toDate).success(querySuccess).error(queryError);
+    };
+
+    $scope.queryItemsByLocationForPeriod = function queryItemsByLocationForPeriod() {
+        // Add 1 day to the 'toDate' to make the date inclusive
+        var toDate = new Date($scope.data.itemLoc.toDate.getFullYear(), $scope.data.itemLoc.toDate.getMonth(), $scope.data.itemLoc.toDate.getDate() + 1);
+        reportService.query(['Location', 'Item'], $scope.data.itemLoc.fromDate, toDate).success(querySuccess).error(queryError);
+    };
+})
+
+.controller('ReportController', function($scope) {
+
 });

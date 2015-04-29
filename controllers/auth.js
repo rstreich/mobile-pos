@@ -3,7 +3,7 @@ var bcrypt = require('bcrypt');
 var async = require('async');
 var unless = require('express-unless');
 var userModel = require('../models/user');
-var ServerError = require('../lib/server-error');
+var ServerError = require('../lib/errors').ServerError;
 var protocol = require('../www/js/protocol');
 
 var inspect = require('util').inspect;
