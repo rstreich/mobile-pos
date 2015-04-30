@@ -31,7 +31,8 @@ var totalsByLocation = 'SELECT Locations.name as Location,' +
     ' FROM Sales' +
     ' JOIN Locations ON Sales.location = Locations.id' +
     ' WHERE Sales.saleDate BETWEEN ? AND ?' +
-    ' GROUP BY Location';
+    ' GROUP BY Location' +
+    ' ORDER BY Location';
 
 var totalsByItem = 'SELECT Items.name as Item,' +
       ' format(sum(SoldItems.quantity), 2) as Quantity,' +
@@ -42,7 +43,8 @@ var totalsByItem = 'SELECT Items.name as Item,' +
     ' JOIN UnitsOfMeasure ON Items.uom = UnitsOfMeasure.id' +
     ' JOIN Sales on SoldItems.sale = Sales.id' +
     ' WHERE Sales.saleDate BETWEEN ? AND ?' +
-    ' GROUP BY Item';
+    ' GROUP BY Item' +
+    ' ORDER BY Item';
 
 function makeComboQuery(arg1, arg2) {
     return 'SELECT ' + arg1 + 's.name as ' + arg1 + ',' +
@@ -56,7 +58,8 @@ function makeComboQuery(arg1, arg2) {
         ' JOIN Sales ON SoldItems.sale = Sales.id' +
         ' JOIN Locations ON Sales.location = Locations.id' +
         ' WHERE Sales.saleDate BETWEEN ? AND ?' +
-        ' GROUP BY ' + arg1 + ', ' + arg2;
+        ' GROUP BY ' + arg1 + ', ' + arg2 +
+        ' ORDER BY ' + arg1 + ', ' + arg2;
 }
 
 var totalsByItemLocation = makeComboQuery('Item', 'Location');
