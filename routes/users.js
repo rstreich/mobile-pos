@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var users = require('../controllers/users');
-var auth = require('../controllers/auth');
+var auth = require('../lib/auth');
 
 router.route('/')
 .get(auth.verifyAdmin, users.getAll) // Admin only

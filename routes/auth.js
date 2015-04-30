@@ -1,5 +1,5 @@
 var express = require('express');
-var auth = require('../controllers/auth');
+var auth = require('../lib/auth');
 
 var router = express.Router();
 router.post('/login', auth.login);

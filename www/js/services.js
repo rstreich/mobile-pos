@@ -451,7 +451,7 @@ angular.module('produce.services', [])
     this.addItemToCart = function addItemToCart(item) {
         // Quantity initialized to zero--may be off a scale.
         // Make a copy of the item so that it doesn't change price during the sale.
-        this.cart.push({ item: angular.extend({}, item), quantity: 0, subtotal: new Big(0)});
+        this.cart.unshift({ item: angular.extend({}, item), quantity: 0, subtotal: new Big(0)});
     };
 
     this.getCurrentCart = function getCurrentCart() {

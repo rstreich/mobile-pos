@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var uoms = require('../controllers/uoms');
-var auth = require('../controllers/auth');
+var auth = require('../lib/auth');
 
 router.route('/')
 .get(uoms.getAll)

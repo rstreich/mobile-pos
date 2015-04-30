@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var items = require('../controllers/items');
-var auth = require('../controllers/auth');
+var auth = require('../lib/auth');
 
 router.route('/')
 .get(items.getAll) // Catalog view

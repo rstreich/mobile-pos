@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var locations = require('../controllers/locations');
-var auth = require('../controllers/auth');
+var auth = require('../lib/auth');
 
 router.route('/')
 .get(locations.getAll)

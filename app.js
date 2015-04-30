@@ -4,26 +4,19 @@ var favicons = require('connect-favicons');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var bunyan = require('bunyan');
+// TODO: Get rid of Morgan?
 
 var ServerError = require('./lib/errors').ServerError;
 var NotFoundError = require('./lib/errors').NotFoundError;
 var addHeaders = require('./lib/headers');
 var protocol = require('./www/js/protocol.js');
-var auth2 = require('./controllers/auth');
+var auth = require('./lib/auth');
 
-// All client side stuff--not fighting the angular generator
+// All client side stuff--not fighting the ionic generator
 var clientRoot = path.join(__dirname, 'www');
 var imageRoot = path.join(clientRoot, 'img');
 
-// Routes
-var auth = require('./routes/auth');
-var users = require('./routes/users');
-var locations = require('./routes/locations');
-var items = require('./routes/items');
-var uoms = require('./routes/uoms');
-var sales = require('./routes/sales');
-var images = require('./routes/images');
-
+// TODO: Write log to file.
 var log = bunyan.createLogger({
     name: 'produce',
     serializers: require('./lib/log-serializers')
@@ -36,30 +29,32 @@ app.disable('x-powered-by');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+// Favorites icons
 app.use(favicons(path.join(imageRoot, 'icons')));
 app.use(logger('dev'));
 
-app.use('/api', auth2.verifyAuthenticated);
+// Miscellaneous headers
+app.use(addHeaders);
+
+// Guard any access to the REST API
+app.use('/api', auth.verifyAuthenticated);
 app.use(express.static(clientRoot));
 
-app.use('/api', auth2.verifyAuthenticated);
+app.use(bodyParser.json({}));
 
 var imageUploadConfig = {
     uploadPath: path.join(imageRoot, 'uploads'),
     imagePath: path.join(imageRoot, 'items')
 };
 
-app.use(bodyParser.json({}));
-//app.use(bodyParser.urlencoded({ extended: false }));
-
-// Map all of the routes.
-app.use('/api/auth', auth);
-app.use('/api/images', images(imageUploadConfig));
-app.use('/api/users', users);
-app.use('/api/locations', locations);
-app.use('/api/items', items);
-app.use('/api/uoms', uoms);
-app.use('/api/sales', sales);
+// Map all of the API routes.
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/images', require('./routes/images')(imageUploadConfig));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/locations', require('./routes/locations'));
+app.use('/api/items', require('./routes/items'));
+app.use('/api/uoms', require('./routes/uoms'));
+app.use('/api/sales', require('./routes/sales'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -73,7 +68,7 @@ app.use(function jsonErrorHandler(err, req, res, next) {
         return next(err);
     }
     log.error({ req: req, err: err });
-    protocol.writeError(err.status || 500, req, res, err);
+    protocol.writeError(err.status, req, res, err);
 });
 
 // development error handler
